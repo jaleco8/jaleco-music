@@ -1,12 +1,14 @@
 <template lang="pug">
   section.hero.is-success
     .hero-head
-      header.nav
+      header.navbar
         .container
-          .nav-left
+          .nav-start
             .nav-item
-              strong Jaleco Music
-          .nav-right.nav-menu
+              strong 📻 Jaleco Music
+          .navbar-end.navbar-menu
+            router-link.navbar-item(to="/") Buscar
+            router-link.navbar-item(to="about") Nosotros
       .hero-body
         .container.has-text-centered
           h1.title Jaleco Music
