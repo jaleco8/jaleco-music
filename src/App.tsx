@@ -12,17 +12,19 @@ import './App.css'
 
 type ViewMode = 'prep' | 'live'
 type PlaybackStatus = 'stopped' | 'countdown' | 'playing' | 'paused' | 'exploring'
-type RepeatTarget = 10 | 20 | 30 | 40 | 'inf'
+type RepeatTarget = 5 | 10 | 20 | 30 | 40 | 'inf'
 type LineSpacing = 'compact' | 'normal' | 'relaxed'
 type GestureMode = 'idle' | 'pending' | 'horizontal' | 'vertical'
 type Cue = {
-  id: number
+  id: string
   text: string
+  translation?: string
   start: number
   end: number
   duration: number
   weight: number
 }
+type CueDraft = Pick<Cue, 'text' | 'translation'>
 
 type TapSide = 'left' | 'center' | 'right'
 
@@ -44,7 +46,7 @@ Vuelves al inicio sin perder foco
 Aprender se vuelve fluido`
 
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5] as const
-const REPEAT_OPTIONS: RepeatTarget[] = [10, 20, 30, 40, 'inf']
+const REPEAT_OPTIONS: RepeatTarget[] = [5, 10, 20, 30, 40, 'inf']
 const FONT_LEVELS = [30, 36, 44, 52]
 const PREVIEW_FONT_LEVELS = [18, 22, 26, 30]
 const LINE_HEIGHTS: Record<LineSpacing, number> = {
@@ -66,6 +68,31 @@ const splitLines = (text: string): string[] =>
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
 
+const buildCueDrafts = (text: string, parseByPairs: boolean): CueDraft[] => {
+  const lines = splitLines(text)
+
+  if (!parseByPairs) {
+    return lines.map((line) => ({ text: line }))
+  }
+
+  const drafts: CueDraft[] = []
+
+  for (let index = 0; index < lines.length; index += 2) {
+    const english = lines[index]
+    if (!english) {
+      continue
+    }
+
+    const translation = lines[index + 1]
+    drafts.push({
+      text: english,
+      translation: translation ? translation : undefined,
+    })
+  }
+
+  return drafts
+}
+
 const formatTime = (seconds: number): string => {
   const total = Math.max(0, Math.floor(seconds))
   const minutes = Math.floor(total / 60)
@@ -73,26 +100,27 @@ const formatTime = (seconds: number): string => {
   return `${minutes}:${secs.toString().padStart(2, '0')}`
 }
 
-const buildCues = (lines: string[], totalDuration?: number): Cue[] => {
-  if (lines.length === 0) {
+const buildCues = (drafts: CueDraft[], totalDuration?: number): Cue[] => {
+  if (drafts.length === 0) {
     return []
   }
 
-  const weights = lines.map((line) => Math.max(1, line.split(/\s+/).filter(Boolean).length))
+  const weights = drafts.map((draft) => Math.max(1, draft.text.split(/\s+/).filter(Boolean).length))
 
   if (totalDuration && totalDuration > 0) {
     const totalWeight = weights.reduce((sum, value) => sum + value, 0)
     let cursor = 0
 
-    return lines.map((line, index) => {
+    return drafts.map((draft, index) => {
       const duration = (weights[index] / totalWeight) * totalDuration
       const start = cursor
-      const end = index === lines.length - 1 ? totalDuration : start + duration
+      const end = index === drafts.length - 1 ? totalDuration : start + duration
       cursor = end
 
       return {
-        id: index,
-        text: line,
+        id: `cue-${index}`,
+        text: draft.text,
+        translation: draft.translation,
         start,
         end,
         duration: end - start,
@@ -103,15 +131,16 @@ const buildCues = (lines: string[], totalDuration?: number): Cue[] => {
 
   let cursor = 0
 
-  return lines.map((line, index) => {
+  return drafts.map((draft, index) => {
     const duration = clamp(weights[index] * 0.5, 1.1, 5.4)
     const start = cursor
     const end = start + duration
     cursor = end
 
     return {
-      id: index,
-      text: line,
+      id: `cue-${index}`,
+      text: draft.text,
+      translation: draft.translation,
       start,
       end,
       duration,
@@ -127,6 +156,8 @@ function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('prep')
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus>('stopped')
   const [lyrics, setLyrics] = useState(SAMPLE_TEXT)
+  const [pairImportMode, setPairImportMode] = useState(false)
+  const [showTranslation, setShowTranslation] = useState(false)
   const [repeatTarget, setRepeatTarget] = useState<RepeatTarget>(20)
   const [playbackRate, setPlaybackRate] = useState<(typeof SPEED_OPTIONS)[number]>(1)
   const [volume, setVolume] = useState(0.85)
@@ -173,11 +204,11 @@ function App() {
     moved: false,
   })
 
-  const lines = useMemo(() => splitLines(lyrics), [lyrics])
+  const cueDrafts = useMemo(() => buildCueDrafts(lyrics, pairImportMode), [lyrics, pairImportMode])
 
   const cues = useMemo(
-    () => buildCues(lines, audioDurationSec > 0 ? audioDurationSec : undefined),
-    [audioDurationSec, lines],
+    () => buildCues(cueDrafts, audioDurationSec > 0 ? audioDurationSec : undefined),
+    [audioDurationSec, cueDrafts],
   )
 
   const totalDuration = cues.length > 0 ? cues[cues.length - 1].end : 0
@@ -357,6 +388,11 @@ function App() {
     }
   }, [])
 
+  const handleBackToPreparation = useCallback(() => {
+    resetSession()
+    setViewMode('prep')
+  }, [resetSession])
+
   const togglePlayback = useCallback(() => {
     if (isActivePlayback) {
       setPlaybackStatus('paused')
@@ -428,12 +464,75 @@ function App() {
     snapToActiveCue('smooth')
   }, [snapToActiveCue])
 
+  const enforceTranslationRepeatFloor = useCallback(() => {
+    setRepeatTarget((current) => {
+      if (typeof current === 'number' && current < 5) {
+        showLoopToast('Repeticiones: x5')
+        return 5
+      }
+
+      return current
+    })
+  }, [showLoopToast])
+
+  const setTranslationVisibility = useCallback(
+    (next: boolean, options?: { recenterLive: boolean }) => {
+      setShowTranslation(next)
+
+      if (next) {
+        enforceTranslationRepeatFloor()
+      }
+
+      if (options?.recenterLive && viewMode === 'live') {
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => {
+            snapToActiveCue('smooth')
+          })
+        })
+      }
+    },
+    [enforceTranslationRepeatFloor, snapToActiveCue, viewMode],
+  )
+
+  const applyRepeatTarget = useCallback(
+    (nextTarget: RepeatTarget) => {
+      if (showTranslation && typeof nextTarget === 'number' && nextTarget < 5) {
+        setRepeatTarget(5)
+        showLoopToast('Repeticiones: x5')
+        return
+      }
+
+      setRepeatTarget(nextTarget)
+    },
+    [showLoopToast, showTranslation],
+  )
+
+  const handleTranslationToggle = useCallback(() => {
+    setTranslationVisibility(!showTranslation, { recenterLive: true })
+  }, [setTranslationVisibility, showTranslation])
+
+  const applyStudyMode = (mode: 'translated' | 'blind') => {
+    if (mode === 'translated') {
+      setTranslationVisibility(true)
+      return
+    }
+
+    setTranslationVisibility(false)
+  }
+
+  const handlePairImportModeChange = (next: boolean) => {
+    if (pairImportMode === next) {
+      return
+    }
+
+    setPairImportMode(next)
+    setTranslationVisibility(next)
+    resetSession()
+  }
+
   const handleLyricsChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setLyrics(event.target.value)
-    setPlayheadSec(0)
-    setCompletedLoops(0)
-    completedLoopsRef.current = 0
-    setPlaybackStatus('stopped')
+    resetSession()
   }
 
   const handleAudioUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -502,7 +601,6 @@ function App() {
       return
     }
 
-    setCountdownValue(3)
     let current = 3
 
     const timer = window.setInterval(() => {
@@ -869,13 +967,59 @@ function App() {
               <textarea
                 value={lyrics}
                 onChange={handleLyricsChange}
-                placeholder="Escribe una línea por frase"
+                placeholder={
+                  pairImportMode
+                    ? 'Pega líneas alternadas: EN, ES, EN, ES...'
+                    : 'Escribe una línea por frase'
+                }
                 data-interactive="true"
               />
+              <div className="chip-row compact" role="radiogroup" aria-label="Modo de importación">
+                <button
+                  type="button"
+                  className={pairImportMode ? 'chip' : 'chip is-active'}
+                  onClick={() => handlePairImportModeChange(false)}
+                  data-interactive="true"
+                >
+                  1 línea = 1 cue
+                </button>
+                <button
+                  type="button"
+                  className={pairImportMode ? 'chip is-active' : 'chip'}
+                  onClick={() => handlePairImportModeChange(true)}
+                  data-interactive="true"
+                >
+                  EN/ES alternado
+                </button>
+              </div>
+              {pairImportMode && (
+                <p className="field-hint">
+                  Se agrupan 2 líneas: primera EN y segunda ES. Si falta la última, queda solo EN.
+                </p>
+              )}
             </label>
 
             <div className="panel-card">
               <p className="panel-title">Ritmo y repetición</p>
+
+              <div className="chip-row" role="radiogroup" aria-label="Modo de estudio">
+                <button
+                  type="button"
+                  className={showTranslation ? 'chip is-active' : 'chip'}
+                  onClick={() => applyStudyMode('translated')}
+                  data-interactive="true"
+                >
+                  Escucha con traducción
+                </button>
+                <button
+                  type="button"
+                  className={showTranslation ? 'chip' : 'chip is-active'}
+                  onClick={() => applyStudyMode('blind')}
+                  data-interactive="true"
+                >
+                  Escucha a ciegas
+                </button>
+              </div>
 
               <div className="chip-row" role="radiogroup" aria-label="Velocidad">
                 {SPEED_OPTIONS.map((option) => (
@@ -897,7 +1041,7 @@ function App() {
                     key={option}
                     type="button"
                     className={repeatTarget === option ? 'chip is-active' : 'chip'}
-                    onClick={() => setRepeatTarget(option)}
+                    onClick={() => applyRepeatTarget(option)}
                     data-interactive="true"
                   >
                     {option === 'inf' ? '∞' : `x${option}`}
@@ -1039,7 +1183,12 @@ function App() {
 
           {controlsVisible && (
             <header className="live-header" data-interactive="true">
-              <button className="ghost-button small" onClick={() => setViewMode('prep')} type="button" data-interactive="true">
+              <button
+                className="ghost-button small"
+                onClick={handleBackToPreparation}
+                type="button"
+                data-interactive="true"
+              >
                 Preparación
               </button>
 
@@ -1047,6 +1196,15 @@ function App() {
                 <strong>{repeatTarget === 'inf' ? '∞' : `x${repeatTarget}`}</strong>
                 {remainingLoops !== null && <small>Restan: {remainingLoops}</small>}
               </div>
+
+              <button
+                type="button"
+                className={showTranslation ? 'chip is-active' : 'chip'}
+                onClick={handleTranslationToggle}
+                data-interactive="true"
+              >
+                ES: {showTranslation ? 'ON' : 'OFF'}
+              </button>
 
               <button className="ghost-button small" onClick={toggleFullscreen} type="button" data-interactive="true">
                 {isFullscreen ? 'Salir' : 'Full'}
@@ -1080,7 +1238,10 @@ function App() {
                         : undefined
                     }
                   >
-                    {cue.text}
+                    <span className="cue-primary">{cue.text}</span>
+                    {showTranslation && cue.translation && (
+                      <span className="cue-translation">{cue.translation}</span>
+                    )}
                   </p>
                 )
               })}
@@ -1129,7 +1290,7 @@ function App() {
                     key={option}
                     type="button"
                     className={repeatTarget === option ? 'chip is-active' : 'chip'}
-                    onClick={() => setRepeatTarget(option)}
+                    onClick={() => applyRepeatTarget(option)}
                     data-interactive="true"
                   >
                     {option === 'inf' ? '∞' : `x${option}`}
