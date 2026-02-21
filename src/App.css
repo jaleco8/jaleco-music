@@ -95,6 +95,18 @@
   gap: 0.58rem;
 }
 
+.field-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.prep-editor-tabs {
+  justify-content: flex-end;
+}
+
 .field > span,
 .panel-title {
   margin: 0;
@@ -119,10 +131,139 @@
   font-family: inherit;
 }
 
+.prep-editor textarea {
+  min-height: 240px;
+}
+
 .field-hint {
   margin: 0;
   font-size: 0.76rem;
   color: var(--text-muted);
+}
+
+.timing-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.62rem;
+}
+
+.timing-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.44rem;
+}
+
+.timing-player {
+  border: 1px solid var(--border-soft);
+  border-radius: 0.88rem;
+  padding: 0.62rem;
+  background: color-mix(in srgb, var(--surface-strong) 74%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.timing-player-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.timing-player input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.timing-player-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+}
+
+.primary-button.timing-cta {
+  padding: 0.42rem 0.8rem;
+  font-size: 0.78rem;
+}
+
+.timing-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.46rem;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 0.12rem;
+}
+
+.timing-row {
+  border: 1px solid var(--border-soft);
+  border-radius: 0.88rem;
+  padding: 0.54rem;
+  background: color-mix(in srgb, var(--surface-strong) 66%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 0.36rem;
+}
+
+.timing-row.is-active {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border-soft));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent);
+  background: color-mix(in srgb, var(--accent-soft) 35%, transparent);
+}
+
+.timing-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.timing-row-end {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.timing-start-field {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  font-size: 0.76rem;
+  color: var(--text-next);
+}
+
+.timing-start-field input {
+  flex: 1;
+  border: 1px solid var(--border-soft);
+  border-radius: 0.58rem;
+  background: color-mix(in srgb, var(--surface-strong) 90%, transparent);
+  color: var(--text-main);
+  padding: 0.34rem 0.44rem;
+  font-size: 0.82rem;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.timing-row-text,
+.timing-row-translation {
+  margin: 0;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.timing-row-text {
+  color: var(--text-main);
+}
+
+.timing-row-translation {
+  color: var(--text-next);
+  font-size: 0.83rem;
+}
+
+.timing-notice {
+  margin: 0;
+  color: color-mix(in srgb, var(--accent) 64%, white 15%);
+  font-size: 0.79rem;
 }
 
 .panel-card {
@@ -238,6 +379,14 @@
   letter-spacing: 0.01em;
 }
 
+.primary-button:disabled,
+.ghost-button:disabled,
+.play-button:disabled,
+.chip:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
 .primary-button {
   background: linear-gradient(120deg, color-mix(in srgb, var(--accent) 78%, white 10%), var(--accent));
   color: #032019;
@@ -301,6 +450,8 @@
 }
 
 .line-indicator {
+  --indicator-size: 20%;
+  --pass-progress: 0;
   position: absolute;
   top: calc(14vh + env(safe-area-inset-top));
   bottom: calc(20vh + env(safe-area-inset-bottom));
@@ -312,13 +463,14 @@
 }
 
 .line-indicator span {
-  display: block;
+  position: absolute;
+  left: 0;
   width: 100%;
-  height: 20%;
+  height: var(--indicator-size);
   border-radius: inherit;
   background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 84%, white 12%), var(--accent));
-  transform: translateY(0%);
-  transition: transform 160ms linear;
+  top: calc((100% - var(--indicator-size)) * var(--pass-progress));
+  transition: top 160ms linear;
 }
 
 .live-header {
@@ -631,6 +783,12 @@
 
   .option-row {
     flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .timing-toolbar {
+    flex-direction: row;
+    align-items: center;
     justify-content: space-between;
   }
 }
