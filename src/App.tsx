@@ -1,6 +1,7 @@
 import {
   type CSSProperties,
   type ChangeEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
   useCallback,
   useEffect,
@@ -14,6 +15,8 @@ type ViewMode = 'prep' | 'live'
 type PlaybackStatus = 'stopped' | 'countdown' | 'playing' | 'paused' | 'exploring'
 type RepeatTarget = 5 | 10 | 20 | 30 | 40 | 'inf'
 type LineSpacing = 'compact' | 'normal' | 'relaxed'
+type PrepEditorTab = 'text' | 'timing'
+type SyncMode = 'auto' | 'manual'
 type GestureMode = 'idle' | 'pending' | 'horizontal' | 'vertical'
 type Cue = {
   id: string
@@ -25,6 +28,12 @@ type Cue = {
   weight: number
 }
 type CueDraft = Pick<Cue, 'text' | 'translation'>
+type PrepPersistedState = {
+  lyrics?: string
+  pairImportMode?: boolean
+  syncMode?: SyncMode
+  manualStarts?: number[]
+}
 
 type TapSide = 'left' | 'center' | 'right'
 
@@ -58,6 +67,9 @@ const LINE_HEIGHTS: Record<LineSpacing, number> = {
 const LIVE_FOCUS_POINT = 0.42
 const DOUBLE_TAP_MS = 280
 const HIDE_CONTROLS_MS = 2600
+const MIN_CUE_GAP_SEC = 0.05
+const SHIFT_STEP_SEC = 0.2
+const PREP_STORAGE_KEY = 'jaleco-music:prep-sync:v1'
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value))
@@ -98,6 +110,93 @@ const formatTime = (seconds: number): string => {
   const minutes = Math.floor(total / 60)
   const secs = total % 60
   return `${minutes}:${secs.toString().padStart(2, '0')}`
+}
+
+const formatTimeWithCentiseconds = (seconds: number): string => {
+  const safe = Math.max(0, seconds)
+  const minutes = Math.floor(safe / 60)
+  const secs = Math.floor(safe % 60)
+  const centiseconds = Math.floor((safe - Math.floor(safe)) * 100)
+  return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${centiseconds
+    .toString()
+    .padStart(2, '0')}`
+}
+
+const parseTimecode = (raw: string): number | null => {
+  const trimmed = raw.trim()
+  if (!trimmed) {
+    return null
+  }
+
+  const asSeconds = Number(trimmed.replace(',', '.'))
+  if (Number.isFinite(asSeconds)) {
+    return asSeconds
+  }
+
+  const match = trimmed.match(/^(\d+):([0-5]\d(?:[.,]\d+)?)$/)
+  if (!match) {
+    return null
+  }
+
+  const minutes = Number(match[1])
+  const seconds = Number(match[2].replace(',', '.'))
+  if (!Number.isFinite(minutes) || !Number.isFinite(seconds)) {
+    return null
+  }
+
+  return minutes * 60 + seconds
+}
+
+const formatSubtitleTimestamp = (seconds: number, separator: '.' | ','): string => {
+  const safe = Math.max(0, seconds)
+  const totalMs = Math.round(safe * 1000)
+  const hours = Math.floor(totalMs / 3_600_000)
+  const minutes = Math.floor((totalMs % 3_600_000) / 60_000)
+  const secs = Math.floor((totalMs % 60_000) / 1000)
+  const milliseconds = totalMs % 1000
+
+  return `${hours.toString().padStart(2, '0')}:${minutes
+    .toString()
+    .padStart(2, '0')}:${secs.toString().padStart(2, '0')}${separator}${milliseconds
+    .toString()
+    .padStart(3, '0')}`
+}
+
+const serializeVtt = (cues: Cue[]): string => {
+  const body = cues
+    .map((cue) => {
+      const start = formatSubtitleTimestamp(cue.start, '.')
+      const end = formatSubtitleTimestamp(cue.end, '.')
+      const text = cue.translation ? `${cue.text}\n${cue.translation}` : cue.text
+      return `${start} --> ${end}\n${text}`
+    })
+    .join('\n\n')
+
+  return `WEBVTT\n\n${body}\n`
+}
+
+const serializeSrt = (cues: Cue[]): string => {
+  return `${cues
+    .map((cue, index) => {
+      const start = formatSubtitleTimestamp(cue.start, ',')
+      const end = formatSubtitleTimestamp(cue.end, ',')
+      const text = cue.translation ? `${cue.text}\n${cue.translation}` : cue.text
+      return `${index + 1}\n${start} --> ${end}\n${text}`
+    })
+    .join('\n\n')}\n`
+}
+
+const downloadTextFile = (filename: string, content: string): void => {
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = filename
+  anchor.style.display = 'none'
+  document.body.append(anchor)
+  anchor.click()
+  anchor.remove()
+  URL.revokeObjectURL(url)
 }
 
 const buildCues = (drafts: CueDraft[], totalDuration?: number): Cue[] => {
@@ -149,6 +248,57 @@ const buildCues = (drafts: CueDraft[], totalDuration?: number): Cue[] => {
   })
 }
 
+const sanitizeManualStarts = (
+  starts: number[],
+  cueCount: number,
+  totalDuration: number,
+  fallbackStarts: number[],
+): number[] => {
+  if (cueCount === 0) {
+    return []
+  }
+
+  const normalized: number[] = []
+  const safeDuration = totalDuration > 0 ? totalDuration : cueCount * 2
+
+  for (let index = 0; index < cueCount; index += 1) {
+    const fallback =
+      fallbackStarts[index] ??
+      (cueCount > 1 ? (index / (cueCount - 1)) * safeDuration : 0)
+    const source = Number.isFinite(starts[index]) ? starts[index] : fallback
+    const min = index === 0 ? 0 : normalized[index - 1] + MIN_CUE_GAP_SEC
+    const max = Math.max(min, safeDuration - (cueCount - index - 1) * MIN_CUE_GAP_SEC)
+    normalized.push(clamp(source, min, max))
+  }
+
+  return normalized
+}
+
+const buildManualCues = (drafts: CueDraft[], starts: number[], totalDuration: number): Cue[] => {
+  if (drafts.length === 0) {
+    return []
+  }
+
+  const safeTotalDuration = Math.max(totalDuration, starts[drafts.length - 1] + MIN_CUE_GAP_SEC)
+  const weights = drafts.map((draft) => Math.max(1, draft.text.split(/\s+/).filter(Boolean).length))
+
+  return drafts.map((draft, index) => {
+    const start = starts[index]
+    const targetEnd = index === drafts.length - 1 ? safeTotalDuration : starts[index + 1]
+    const end = Math.max(start + MIN_CUE_GAP_SEC, targetEnd)
+
+    return {
+      id: `cue-${index}`,
+      text: draft.text,
+      translation: draft.translation,
+      start,
+      end,
+      duration: end - start,
+      weight: weights[index],
+    }
+  })
+}
+
 const isInteractiveTarget = (target: EventTarget | null): boolean =>
   target instanceof HTMLElement && Boolean(target.closest('[data-interactive="true"]'))
 
@@ -178,6 +328,14 @@ function App() {
   const [audioDurationSec, setAudioDurationSec] = useState(0)
   const [gestureMessage, setGestureMessage] = useState('')
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [prepEditorTab, setPrepEditorTab] = useState<PrepEditorTab>('text')
+  const [syncMode, setSyncMode] = useState<SyncMode>('auto')
+  const [manualStarts, setManualStarts] = useState<number[]>([])
+  const [timingCursor, setTimingCursor] = useState(0)
+  const [timingNotice, setTimingNotice] = useState('')
+  const [timeInputDrafts, setTimeInputDrafts] = useState<Record<number, string>>({})
+  const [isPrepAudioPlaying, setIsPrepAudioPlaying] = useState(false)
+  const [prepStateHydrated, setPrepStateHydrated] = useState(false)
 
   const stageRef = useRef<HTMLDivElement | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -186,6 +344,7 @@ function App() {
   const hideControlsTimerRef = useRef<number | null>(null)
   const loopToastTimerRef = useRef<number | null>(null)
   const gestureMessageTimerRef = useRef<number | null>(null)
+  const timingNoticeTimerRef = useRef<number | null>(null)
   const singleTapTimerRef = useRef<number | null>(null)
   const lastTapRef = useRef<{ time: number; side: TapSide }>({
     time: 0,
@@ -206,12 +365,50 @@ function App() {
 
   const cueDrafts = useMemo(() => buildCueDrafts(lyrics, pairImportMode), [lyrics, pairImportMode])
 
-  const cues = useMemo(
+  const autoCues = useMemo(
     () => buildCues(cueDrafts, audioDurationSec > 0 ? audioDurationSec : undefined),
     [audioDurationSec, cueDrafts],
   )
 
+  const autoStarts = useMemo(() => autoCues.map((cue) => cue.start), [autoCues])
+  const autoDuration = autoCues.length > 0 ? autoCues[autoCues.length - 1].end : 0
+  const syncDurationBase = audioDurationSec > 0 ? audioDurationSec : autoDuration
+
+  const fallbackStarts = useMemo(() => {
+    if (autoStarts.length === cueDrafts.length) {
+      return autoStarts
+    }
+
+    if (cueDrafts.length === 0) {
+      return []
+    }
+
+    if (cueDrafts.length === 1) {
+      return [0]
+    }
+
+    const fallbackDuration = syncDurationBase > 0 ? syncDurationBase : cueDrafts.length * 2
+    return cueDrafts.map((_, index) => (index / (cueDrafts.length - 1)) * fallbackDuration)
+  }, [autoStarts, cueDrafts, syncDurationBase])
+
+  const normalizedManualStarts = useMemo(
+    () => sanitizeManualStarts(manualStarts, cueDrafts.length, syncDurationBase, fallbackStarts),
+    [cueDrafts.length, fallbackStarts, manualStarts, syncDurationBase],
+  )
+
+  const manualCues = useMemo(
+    () => buildManualCues(cueDrafts, normalizedManualStarts, syncDurationBase),
+    [cueDrafts, normalizedManualStarts, syncDurationBase],
+  )
+
+  const cues = useMemo(
+    () => (syncMode === 'manual' ? manualCues : autoCues),
+    [autoCues, manualCues, syncMode],
+  )
+
   const totalDuration = cues.length > 0 ? cues[cues.length - 1].end : 0
+  const cuesForEditor = syncMode === 'manual' ? manualCues : autoCues
+  const editorDuration = Math.max(totalDuration, syncDurationBase, 0.1)
 
   const repeatTargetRef = useRef<RepeatTarget>(repeatTarget)
   const totalDurationRef = useRef(totalDuration)
@@ -228,6 +425,71 @@ function App() {
   useEffect(() => {
     completedLoopsRef.current = completedLoops
   }, [completedLoops])
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(PREP_STORAGE_KEY)
+      if (!raw) {
+        return
+      }
+
+      const persisted = JSON.parse(raw) as PrepPersistedState
+      if (typeof persisted.lyrics === 'string') {
+        setLyrics(persisted.lyrics)
+      }
+      if (typeof persisted.pairImportMode === 'boolean') {
+        setPairImportMode(persisted.pairImportMode)
+        setShowTranslation(persisted.pairImportMode)
+      }
+      if (persisted.syncMode === 'auto' || persisted.syncMode === 'manual') {
+        setSyncMode(persisted.syncMode)
+      }
+      if (Array.isArray(persisted.manualStarts)) {
+        const starts = persisted.manualStarts
+          .map((value) => Number(value))
+          .filter((value) => Number.isFinite(value))
+        setManualStarts(starts)
+      }
+    } catch {
+      // Ignore malformed local state and keep defaults.
+    } finally {
+      setPrepStateHydrated(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!prepStateHydrated) {
+      return
+    }
+
+    const payload: PrepPersistedState = {
+      lyrics,
+      pairImportMode,
+      syncMode,
+      manualStarts: normalizedManualStarts,
+    }
+
+    try {
+      window.localStorage.setItem(PREP_STORAGE_KEY, JSON.stringify(payload))
+    } catch {
+      // Ignore persistence errors (private mode / storage limits).
+    }
+  }, [lyrics, normalizedManualStarts, pairImportMode, prepStateHydrated, syncMode])
+
+  useEffect(() => {
+    setTimingCursor((current) => clamp(current, 0, Math.max(cueDrafts.length - 1, 0)))
+  }, [cueDrafts.length])
+
+  useEffect(() => {
+    setTimeInputDrafts((current) => {
+      const filtered = Object.entries(current).filter(([key]) => Number(key) < cueDrafts.length)
+      if (filtered.length === Object.keys(current).length) {
+        return current
+      }
+
+      return Object.fromEntries(filtered) as Record<number, string>
+    })
+  }, [cueDrafts.length])
 
   const isActivePlayback = playbackStatus === 'playing' || playbackStatus === 'exploring'
 
@@ -270,6 +532,18 @@ function App() {
     }, 850)
   }, [])
 
+  const showTimingNotice = useCallback((message: string) => {
+    setTimingNotice(message)
+
+    if (timingNoticeTimerRef.current !== null) {
+      window.clearTimeout(timingNoticeTimerRef.current)
+    }
+
+    timingNoticeTimerRef.current = window.setTimeout(() => {
+      setTimingNotice('')
+    }, 1800)
+  }, [])
+
   const seekTo = useCallback(
     (nextTime: number) => {
       const clamped = clamp(nextTime, 0, totalDurationRef.current)
@@ -289,6 +563,215 @@ function App() {
       setGestureFeedback(delta < 0 ? '-10s' : '+10s')
     },
     [playheadSec, seekTo, setGestureFeedback],
+  )
+
+  const readEditorTimeSec = useCallback(() => {
+    const audio = audioRef.current
+    if (audio && audioUrl) {
+      return audio.currentTime
+    }
+
+    return playheadSec
+  }, [audioUrl, playheadSec])
+
+  const mutateManualStarts = useCallback(
+    (mutate: (starts: number[]) => void) => {
+      if (cueDrafts.length === 0) {
+        return
+      }
+
+      setManualStarts((current) => {
+        const baseline = current.length === cueDrafts.length ? [...current] : [...fallbackStarts]
+        mutate(baseline)
+        return sanitizeManualStarts(baseline, cueDrafts.length, syncDurationBase, fallbackStarts)
+      })
+      setSyncMode('manual')
+    },
+    [cueDrafts.length, fallbackStarts, syncDurationBase],
+  )
+
+  const restoreAutoSync = useCallback(() => {
+    setSyncMode('auto')
+    setManualStarts([])
+    setTimeInputDrafts({})
+    showTimingNotice('Tiempos estimados regenerados.')
+  }, [showTimingNotice])
+
+  const markStartAndAdvance = useCallback(() => {
+    if (cueDrafts.length === 0) {
+      return
+    }
+
+    const index = clamp(timingCursor, 0, cueDrafts.length - 1)
+    const markedTime = clamp(readEditorTimeSec(), 0, Math.max(totalDurationRef.current, 0))
+
+    mutateManualStarts((starts) => {
+      starts[index] = markedTime
+    })
+
+    setTimingCursor(Math.min(index + 1, cueDrafts.length - 1))
+    showTimingNotice(`Cue ${index + 1} en ${formatTimeWithCentiseconds(markedTime)}`)
+  }, [cueDrafts.length, mutateManualStarts, readEditorTimeSec, showTimingNotice, timingCursor])
+
+  const markEndAtCursor = useCallback(() => {
+    if (cueDrafts.length === 0) {
+      return
+    }
+
+    const index = clamp(timingCursor, 0, cueDrafts.length - 1)
+    if (index >= cueDrafts.length - 1) {
+      showTimingNotice('El último cue termina al final del audio.')
+      return
+    }
+
+    const markedTime = clamp(readEditorTimeSec(), 0, Math.max(totalDurationRef.current, 0))
+
+    mutateManualStarts((starts) => {
+      starts[index + 1] = markedTime
+    })
+
+    setTimingCursor(index + 1)
+    showTimingNotice(`Fin cue ${index + 1} en ${formatTimeWithCentiseconds(markedTime)}`)
+  }, [cueDrafts.length, mutateManualStarts, readEditorTimeSec, showTimingNotice, timingCursor])
+
+  const shiftFromCursor = useCallback(
+    (delta: number) => {
+      if (cueDrafts.length === 0) {
+        return
+      }
+
+      const fromIndex = clamp(timingCursor, 0, cueDrafts.length - 1)
+      mutateManualStarts((starts) => {
+        for (let index = fromIndex; index < starts.length; index += 1) {
+          starts[index] += delta
+        }
+      })
+
+      showTimingNotice(
+        `Shift ${delta >= 0 ? '+' : ''}${delta.toFixed(1)}s desde cue ${fromIndex + 1}`,
+      )
+    },
+    [cueDrafts.length, mutateManualStarts, showTimingNotice, timingCursor],
+  )
+
+  const handleStartInputChange = useCallback((index: number, value: string) => {
+    setTimingCursor(index)
+    setTimeInputDrafts((current) => ({
+      ...current,
+      [index]: value,
+    }))
+  }, [])
+
+  const clearTimeInputDraft = useCallback((index: number) => {
+    setTimeInputDrafts((current) => {
+      if (!(index in current)) {
+        return current
+      }
+
+      const next = { ...current }
+      delete next[index]
+      return next
+    })
+  }, [])
+
+  const commitStartInput = useCallback(
+    (index: number) => {
+      const source = timeInputDrafts[index]
+      if (!source) {
+        return
+      }
+
+      const parsed = parseTimecode(source)
+      if (parsed === null) {
+        clearTimeInputDraft(index)
+        showTimingNotice('Formato inválido. Usa mm:ss.cs o segundos.')
+        return
+      }
+
+      const bounded = Math.max(0, parsed)
+      mutateManualStarts((starts) => {
+        starts[index] = bounded
+      })
+      clearTimeInputDraft(index)
+      showTimingNotice(`Cue ${index + 1} ajustado a ${formatTimeWithCentiseconds(bounded)}`)
+    },
+    [clearTimeInputDraft, mutateManualStarts, showTimingNotice, timeInputDrafts],
+  )
+
+  const handleStartInputKeyDown = useCallback(
+    (index: number, event: ReactKeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        event.currentTarget.blur()
+      }
+
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        clearTimeInputDraft(index)
+        event.currentTarget.blur()
+      }
+    },
+    [clearTimeInputDraft],
+  )
+
+  const selectCueForTiming = useCallback(
+    (index: number) => {
+      const cue = cuesForEditor[index]
+      if (!cue) {
+        return
+      }
+
+      setTimingCursor(index)
+      seekTo(cue.start)
+    },
+    [cuesForEditor, seekTo],
+  )
+
+  const togglePrepAudio = useCallback(async () => {
+    const audio = audioRef.current
+    if (!audio || !audioUrl) {
+      showTimingNotice('Carga un audio para marcar sincronía real.')
+      return
+    }
+
+    if (isPrepAudioPlaying) {
+      audio.pause()
+      setIsPrepAudioPlaying(false)
+      return
+    }
+
+    audio.playbackRate = 1
+    audio.volume = volume
+    audio.currentTime = clamp(playheadSec, 0, totalDurationRef.current)
+
+    try {
+      await audio.play()
+      setIsPrepAudioPlaying(true)
+    } catch {
+      setIsPrepAudioPlaying(false)
+      showTimingNotice('No se pudo reproducir el audio.')
+    }
+  }, [audioUrl, isPrepAudioPlaying, playheadSec, showTimingNotice, volume])
+
+  const seekEditorBy = useCallback(
+    (delta: number) => {
+      seekTo(readEditorTimeSec() + delta)
+    },
+    [readEditorTimeSec, seekTo],
+  )
+
+  const exportCurrentCues = useCallback(
+    (format: 'vtt' | 'srt') => {
+      if (cuesForEditor.length === 0) {
+        return
+      }
+
+      const payload = format === 'vtt' ? serializeVtt(cuesForEditor) : serializeSrt(cuesForEditor)
+      const stamp = new Date().toISOString().slice(0, 10)
+      downloadTextFile(`jaleco-sync-${stamp}.${format}`, payload)
+      showTimingNotice(`Exportado ${format.toUpperCase()}`)
+    },
+    [cuesForEditor, showTimingNotice],
   )
 
   const showLoopToast = useCallback((message: string) => {
@@ -380,6 +863,7 @@ function App() {
     setCompletedLoops(0)
     completedLoopsRef.current = 0
     setCountdownValue(0)
+    setIsPrepAudioPlaying(false)
 
     const audio = audioRef.current
     if (audio) {
@@ -404,6 +888,11 @@ function App() {
     }
 
     if (viewMode === 'prep') {
+      const audio = audioRef.current
+      if (audio) {
+        audio.pause()
+      }
+      setIsPrepAudioPlaying(false)
       setViewMode('live')
     }
 
@@ -525,13 +1014,32 @@ function App() {
       return
     }
 
+    const nextCueCount = buildCueDrafts(lyrics, next).length
+    if (syncMode === 'manual' && cueDrafts.length !== nextCueCount) {
+      setSyncMode('auto')
+      setManualStarts([])
+      setTimingCursor(0)
+      setTimeInputDrafts({})
+      showTimingNotice('Cambió el conteo de cues. Se regeneraron tiempos automáticos.')
+    }
+
     setPairImportMode(next)
-    setTranslationVisibility(next)
+    setTranslationVisibility(next, { recenterLive: false })
     resetSession()
   }
 
   const handleLyricsChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    setLyrics(event.target.value)
+    const nextLyrics = event.target.value
+    const nextCueCount = buildCueDrafts(nextLyrics, pairImportMode).length
+    if (syncMode === 'manual' && cueDrafts.length !== nextCueCount) {
+      setSyncMode('auto')
+      setManualStarts([])
+      setTimingCursor(0)
+      setTimeInputDrafts({})
+      showTimingNotice('Cambió el conteo de cues. Se regeneraron tiempos automáticos.')
+    }
+
+    setLyrics(nextLyrics)
     resetSession()
   }
 
@@ -633,17 +1141,46 @@ function App() {
     }
 
     const onEnded = () => {
-      finishPass()
+      setIsPrepAudioPlaying(false)
+      setPlayheadSec(audio.currentTime)
+
+      if (isActivePlayback) {
+        finishPass()
+      }
+    }
+
+    const onTimeUpdate = () => {
+      if (!isActivePlayback) {
+        setPlayheadSec(audio.currentTime)
+      }
+    }
+
+    const onPlay = () => {
+      if (!isActivePlayback) {
+        setIsPrepAudioPlaying(true)
+      }
+    }
+
+    const onPause = () => {
+      if (!isActivePlayback) {
+        setIsPrepAudioPlaying(false)
+      }
     }
 
     audio.addEventListener('loadedmetadata', onLoadedMetadata)
     audio.addEventListener('ended', onEnded)
+    audio.addEventListener('timeupdate', onTimeUpdate)
+    audio.addEventListener('play', onPlay)
+    audio.addEventListener('pause', onPause)
 
     return () => {
       audio.removeEventListener('loadedmetadata', onLoadedMetadata)
       audio.removeEventListener('ended', onEnded)
+      audio.removeEventListener('timeupdate', onTimeUpdate)
+      audio.removeEventListener('play', onPlay)
+      audio.removeEventListener('pause', onPause)
     }
-  }, [finishPass])
+  }, [finishPass, isActivePlayback])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -788,6 +1325,10 @@ function App() {
 
       if (singleTapTimerRef.current !== null) {
         window.clearTimeout(singleTapTimerRef.current)
+      }
+
+      if (timingNoticeTimerRef.current !== null) {
+        window.clearTimeout(timingNoticeTimerRef.current)
       }
     }
   }, [])
@@ -962,42 +1503,238 @@ function App() {
           </header>
 
           <div className="prep-grid">
-            <label className="field">
-              <span>Texto / letras</span>
-              <textarea
-                value={lyrics}
-                onChange={handleLyricsChange}
-                placeholder={
-                  pairImportMode
-                    ? 'Pega líneas alternadas: EN, ES, EN, ES...'
-                    : 'Escribe una línea por frase'
-                }
-                data-interactive="true"
-              />
-              <div className="chip-row compact" role="radiogroup" aria-label="Modo de importación">
-                <button
-                  type="button"
-                  className={pairImportMode ? 'chip' : 'chip is-active'}
-                  onClick={() => handlePairImportModeChange(false)}
-                  data-interactive="true"
-                >
-                  1 línea = 1 cue
-                </button>
-                <button
-                  type="button"
-                  className={pairImportMode ? 'chip is-active' : 'chip'}
-                  onClick={() => handlePairImportModeChange(true)}
-                  data-interactive="true"
-                >
-                  EN/ES alternado
-                </button>
+            <div className="field prep-editor">
+              <div className="field-header">
+                <span>Texto / letras</span>
+                <div className="chip-row compact prep-editor-tabs" role="tablist" aria-label="Editor de preparación">
+                  <button
+                    type="button"
+                    className={prepEditorTab === 'text' ? 'chip is-active' : 'chip'}
+                    onClick={() => setPrepEditorTab('text')}
+                    data-interactive="true"
+                  >
+                    Editar texto
+                  </button>
+                  <button
+                    type="button"
+                    className={prepEditorTab === 'timing' ? 'chip is-active' : 'chip'}
+                    onClick={() => setPrepEditorTab('timing')}
+                    data-interactive="true"
+                  >
+                    Editar tiempos
+                  </button>
+                </div>
               </div>
-              {pairImportMode && (
-                <p className="field-hint">
-                  Se agrupan 2 líneas: primera EN y segunda ES. Si falta la última, queda solo EN.
-                </p>
+
+              {prepEditorTab === 'text' && (
+                <>
+                  <textarea
+                    value={lyrics}
+                    onChange={handleLyricsChange}
+                    placeholder={
+                      pairImportMode
+                        ? 'Pega líneas alternadas: EN, ES, EN, ES...'
+                        : 'Escribe una línea por frase'
+                    }
+                    data-interactive="true"
+                  />
+                  <div className="chip-row compact" role="radiogroup" aria-label="Modo de importación">
+                    <button
+                      type="button"
+                      className={pairImportMode ? 'chip' : 'chip is-active'}
+                      onClick={() => handlePairImportModeChange(false)}
+                      data-interactive="true"
+                    >
+                      1 línea = 1 cue
+                    </button>
+                    <button
+                      type="button"
+                      className={pairImportMode ? 'chip is-active' : 'chip'}
+                      onClick={() => handlePairImportModeChange(true)}
+                      data-interactive="true"
+                    >
+                      EN/ES alternado
+                    </button>
+                  </div>
+                  {pairImportMode && (
+                    <p className="field-hint">
+                      Se agrupan 2 líneas: primera EN y segunda ES. Si falta la última, queda solo EN.
+                    </p>
+                  )}
+                </>
               )}
-            </label>
+
+              {prepEditorTab === 'timing' && (
+                <div className="timing-editor">
+                  <div className="timing-toolbar">
+                    <p className="field-hint">
+                      {syncMode === 'manual' ? 'Sincronía manual activa' : 'Sincronía automática estimada'}
+                    </p>
+                    <div className="chip-row compact">
+                      <button
+                        type="button"
+                        className={syncMode === 'auto' ? 'chip is-active' : 'chip'}
+                        onClick={restoreAutoSync}
+                        data-interactive="true"
+                      >
+                        Auto
+                      </button>
+                      <button
+                        type="button"
+                        className="chip"
+                        onClick={() => shiftFromCursor(-SHIFT_STEP_SEC)}
+                        disabled={cueDrafts.length === 0}
+                        data-interactive="true"
+                      >
+                        Shift -0.2s
+                      </button>
+                      <button
+                        type="button"
+                        className="chip"
+                        onClick={() => shiftFromCursor(SHIFT_STEP_SEC)}
+                        disabled={cueDrafts.length === 0}
+                        data-interactive="true"
+                      >
+                        Shift +0.2s
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="timing-player" data-interactive="true">
+                    <div className="timing-player-actions">
+                      <button
+                        className="play-button"
+                        type="button"
+                        onClick={togglePrepAudio}
+                        disabled={!audioUrl}
+                        data-interactive="true"
+                      >
+                        {isPrepAudioPlaying ? 'Pausa' : 'Play'}
+                      </button>
+                      <button
+                        className="ghost-button small"
+                        type="button"
+                        onClick={() => seekEditorBy(-5)}
+                        disabled={cuesForEditor.length === 0}
+                        data-interactive="true"
+                      >
+                        -5s
+                      </button>
+                      <button
+                        className="ghost-button small"
+                        type="button"
+                        onClick={() => seekEditorBy(5)}
+                        disabled={cuesForEditor.length === 0}
+                        data-interactive="true"
+                      >
+                        +5s
+                      </button>
+                    </div>
+
+                    <input
+                      type="range"
+                      min={0}
+                      max={editorDuration}
+                      step={0.01}
+                      value={clamp(playheadSec, 0, editorDuration)}
+                      onChange={(event) => seekTo(Number(event.target.value))}
+                      disabled={cuesForEditor.length === 0}
+                      data-interactive="true"
+                    />
+
+                    <div className="timing-player-meta">
+                      <span>{formatTimeWithCentiseconds(playheadSec)}</span>
+                      <span>{formatTimeWithCentiseconds(editorDuration)}</span>
+                    </div>
+
+                    <div className="timing-player-actions">
+                      <button
+                        className="primary-button timing-cta"
+                        type="button"
+                        onClick={markStartAndAdvance}
+                        disabled={cuesForEditor.length === 0}
+                        data-interactive="true"
+                      >
+                        Marcar inicio y siguiente
+                      </button>
+                      <button
+                        className="ghost-button small"
+                        type="button"
+                        onClick={markEndAtCursor}
+                        disabled={cuesForEditor.length === 0}
+                        data-interactive="true"
+                      >
+                        Marcar fin
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="timing-list">
+                    {cuesForEditor.map((cue, index) => (
+                      <article
+                        key={cue.id}
+                        className={index === timingCursor ? 'timing-row is-active' : 'timing-row'}
+                      >
+                        <div className="timing-row-head">
+                          <button
+                            type="button"
+                            className={index === timingCursor ? 'chip is-active' : 'chip'}
+                            onClick={() => selectCueForTiming(index)}
+                            data-interactive="true"
+                          >
+                            Cue {index + 1}
+                          </button>
+                          <span className="timing-row-end">Fin {formatTimeWithCentiseconds(cue.end)}</span>
+                        </div>
+
+                        <label className="timing-start-field">
+                          <span>Inicio</span>
+                          <input
+                            type="text"
+                            value={timeInputDrafts[index] ?? formatTimeWithCentiseconds(cue.start)}
+                            onChange={(event) => handleStartInputChange(index, event.target.value)}
+                            onFocus={() => setTimingCursor(index)}
+                            onBlur={() => commitStartInput(index)}
+                            onKeyDown={(event) => handleStartInputKeyDown(index, event)}
+                            data-interactive="true"
+                          />
+                        </label>
+
+                        <p className="timing-row-text">{cue.text}</p>
+                        {cue.translation && <p className="timing-row-translation">{cue.translation}</p>}
+                      </article>
+                    ))}
+                  </div>
+
+                  {cuesForEditor.length === 0 && (
+                    <p className="field-hint">Agrega texto para generar cues y empezar a sincronizar.</p>
+                  )}
+
+                  <div className="chip-row compact">
+                    <button
+                      type="button"
+                      className="chip"
+                      onClick={() => exportCurrentCues('vtt')}
+                      disabled={cuesForEditor.length === 0}
+                      data-interactive="true"
+                    >
+                      Exportar .vtt
+                    </button>
+                    <button
+                      type="button"
+                      className="chip"
+                      onClick={() => exportCurrentCues('srt')}
+                      disabled={cuesForEditor.length === 0}
+                      data-interactive="true"
+                    >
+                      Exportar .srt
+                    </button>
+                  </div>
+
+                  {timingNotice && <p className="timing-notice">{timingNotice}</p>}
+                </div>
+              )}
+            </div>
 
             <div className="panel-card">
               <p className="panel-title">Ritmo y repetición</p>
@@ -1157,7 +1894,8 @@ function App() {
 
           <footer className="prep-footer">
             <p>
-              {cues.length} cues · {formatTime(totalDuration)} por vuelta · {repeatTarget === 'inf' ? '∞' : `x${repeatTarget}`}
+              {cues.length} cues · {formatTime(totalDuration)} por vuelta · Sync {syncMode === 'manual' ? 'manual' : 'auto'} ·{' '}
+              {repeatTarget === 'inf' ? '∞' : `x${repeatTarget}`}
             </p>
             <button className="primary-button" onClick={togglePlayback} type="button" data-interactive="true">
               Iniciar Live
@@ -1177,8 +1915,12 @@ function App() {
             <span style={{ transform: `scaleX(${passProgress})` }} />
           </div>
 
-          <aside className="line-indicator" aria-hidden="true">
-            <span style={{ transform: `translateY(${passProgress * 100}%)` }} />
+          <aside
+            className="line-indicator"
+            style={{ '--pass-progress': `${passProgress}` } as CSSProperties}
+            aria-hidden="true"
+          >
+            <span />
           </aside>
 
           {controlsVisible && (
