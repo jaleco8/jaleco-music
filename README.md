@@ -16,8 +16,6 @@ Jaleco Music te da una experiencia tipo “karaoke” para **repetir**, **ajusta
 
 ## Capturas
 
-> Recomendación: guarda estas imágenes en `docs/screenshots/` y referencia aquí.
-
 | Preparación | Live (en ejecución) |
 |---|---|
 | ![Preparación](docs/screenshots/prep.png) | ![Live](docs/screenshots/live.png) |
