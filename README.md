@@ -1,72 +1,66 @@
-# Jaleco Music · Live Teleprompter
+# Jaleco Music
+**Teleprompter web tipo karaoke, mobile-first, para practicar letras o historias con audio, repetición y enfoque.**
 
-MVP mobile-first de teleprompter tipo karaoke con dos estados:
+[Demo en GitHub Pages](https://jaleco8.github.io/jaleco-music/) · [Reportar bug](../../issues) · [Roadmap](#roadmap)
 
-- `Preparación`: edición de texto, repetición, velocidad, volumen y ajustes de legibilidad.
-- `Live`: lectura enfocada con auto-scroll, highlight animado, gestos y controles ocultables.
+> Funciona 100% en el navegador: sin backend, sin cuentas, sin subir tus archivos.
 
-## Ejecutar
+---
+
+## Qué resuelve
+Practicar un texto no debería ser una pelea contra el scroll, el foco o el ritmo.
+
+Jaleco Music te da una experiencia tipo “karaoke” para **repetir**, **ajustar velocidad**, **controlar volumen** y **leer con enfoque** en una vista Live diseñada para móvil.
+
+---
+
+## Capturas
+
+> Recomendación: guarda estas imágenes en `docs/screenshots/` y referencia aquí.
+
+| Preparación | Live (en ejecución) |
+|---|---|
+| ![Preparación](docs/screenshots/prep.png) | ![Live](docs/screenshots/live.png) |
+
+---
+
+## Funcionalidades clave
+
+### Preparación
+- Edición de texto/letras antes de iniciar.
+- Modos de práctica: **con traducción** y **a ciegas** (traducción apagada por defecto en Live).
+- Velocidad: `0.5x · 0.75x · Normal · 1.25x · 1.5x`
+- Repetición rápida: `x5 · x10 · x20 · x30 · x40 · ∞`
+- Legibilidad: tamaños A1–A4, interlineado, modo oscuro y modo enfoque.
+- Audio opcional: carga un archivo local (modo lectura si no hay audio).
+
+### Live
+- Auto-scroll con foco visual (teleprompter real, sin distracciones).
+- Highlight animado por línea + progreso por “cue”.
+- Controles ocultables y auto-hide durante reproducción.
+- Gestos:
+  - Doble tap izquierda: `-10s`
+  - Doble tap derecha: `+10s`
+  - Swipe horizontal: seek fino
+  - Swipe vertical: tamaño de texto
+- Modo “exploring” cuando haces scroll manual + botón para volver a seguir.
+- Cuenta regresiva 3-2-1 opcional y vibración por frase opcional.
+
+---
+
+## Cómo usarlo (en 60 segundos)
+1. Pega tu texto en **Preparación**.
+2. (Opcional) Carga un audio local.
+3. Ajusta velocidad, repetición y legibilidad.
+4. Presiona **Iniciar Live**.
+5. En Live, toca una vez para mostrar/ocultar controles y entra en flow.
+
+---
+
+## Ejecutar en local
+
+Requisitos: **Node.js 18+**
 
 ```bash
 npm install
 npm run dev
-```
-
-Build de producción:
-
-```bash
-npm run build
-npm run preview
-```
-
-## Publicar en GitHub + GitHub Pages
-
-El proyecto ya incluye despliegue automático con GitHub Actions en `.github/workflows/deploy-pages.yml`.
-
-1. Crea un repositorio vacío en GitHub (sin `README` ni `.gitignore`).
-2. En esta carpeta, ejecuta:
-
-```bash
-git init
-git branch -M main
-git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/TU_USUARIO/TU_REPO.git
-git push -u origin main
-```
-
-3. En GitHub, abre `Settings -> Pages` y en `Build and deployment` selecciona `GitHub Actions`.
-4. Cada push a `main` generará una nueva versión en GitHub Pages.
-5. La URL final quedará como:
-
-```text
-https://TU_USUARIO.github.io/TU_REPO/
-```
-
-## Funciones implementadas
-
-- Transición `Preparación -> Live` al presionar Play.
-- Jerarquía visual de texto (`activa`, `previas`, `siguientes`).
-- Highlight animado por línea con banda suave y progreso por cue.
-- Auto-scroll suave con foco cercano al 40% del viewport.
-- Estado `Explorando` al hacer scroll manual + botón `Volver a seguir`.
-- Barra de progreso superior ultra delgada.
-- Controles flotantes inferiores (Play/Pausa, chips de velocidad, repetición, volumen).
-- Tap único para mostrar/ocultar controles y auto-hide en reproducción.
-- Gestos:
-  - doble tap izquierda: `-10s`
-  - doble tap derecha: `+10s`
-  - swipe horizontal: seek fino
-  - swipe vertical: cambio de tamaño de texto
-- Repeticiones rápidas: `x10`, `x20`, `x30`, `x40`, `∞`.
-- Badge live con repetición activa y `Restan: N`.
-- Microanimación de vuelta: `Repetición n/N`.
-- Countdown opcional `3,2,1` y vibración opcional al cambiar de línea.
-- Modo oscuro real, focus mode, safe areas y fullscreen.
-- Audio opcional cargado por archivo local (`input type=file`).
-
-## Stack
-
-- React 19
-- TypeScript
-- Vite
