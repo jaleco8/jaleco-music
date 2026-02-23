@@ -1,7 +1,9 @@
 import {
+  type AriaRole,
   type CSSProperties,
   type ChangeEvent,
   type KeyboardEvent as ReactKeyboardEvent,
+  type ReactNode,
   type PointerEvent as ReactPointerEvent,
   useCallback,
   useEffect,
@@ -19,6 +21,15 @@ type PrepEditorTab = 'text' | 'timing'
 type SyncMode = 'auto' | 'manual'
 type GestureMode = 'idle' | 'pending' | 'horizontal' | 'vertical'
 type StudyMode = 'with-translation' | 'without-translation' | 'interactive'
+type PresetKey = 'quick-start' | 'without-translation' | 'blind' | 'interactive'
+type PresetConfig = {
+  studyMode: StudyMode
+  blindMode: boolean
+  playbackRate: number
+  repeatTarget: RepeatTarget
+  focusMode?: boolean
+  countdownEnabled?: boolean
+}
 type CueKind = 'statement' | 'question'
 type Cue = {
   id: string
@@ -39,6 +50,13 @@ type PrepPersistedState = {
   blindMode?: boolean
 }
 
+type PrepUiSessionState = {
+  audioExpanded?: boolean
+  advancedExpanded?: boolean
+  preset?: PresetKey
+  presetModified?: boolean
+}
+
 type TapSide = 'left' | 'center' | 'right'
 
 type GestureState = {
@@ -49,6 +67,32 @@ type GestureState = {
   startFontLevel: number
   mode: GestureMode
   moved: boolean
+}
+
+type FunnelEventName =
+  | 'prep_view'
+  | 'prep_change_setting'
+  | 'prep_click_start_live'
+  | 'live_started'
+  | 'prep_abandon'
+  | 'prep_audio_expand'
+  | 'ab_exposure'
+  | 'ab_conversion'
+
+type ExperimentKey =
+  | 'prep_sticky_footer'
+  | 'prep_audio_collapsed'
+  | 'prep_quick_presets'
+  | 'prep_advanced_settings'
+  | 'prep_mode_tooltips'
+
+type ExperimentVariant = 'control' | 'variant'
+type ExperimentAssignments = Record<ExperimentKey, ExperimentVariant>
+
+declare global {
+  interface Window {
+    dataLayer?: Array<Record<string, unknown>>
+  }
 }
 
 const SAMPLE_TEXT = `Respira profundo y entra en calma
@@ -74,6 +118,89 @@ const HIDE_CONTROLS_MS = 2600
 const MIN_CUE_GAP_SEC = 0.05
 const SHIFT_STEP_SEC = 0.2
 const PREP_STORAGE_KEY = 'jaleco-music:prep-sync:v1'
+const PREP_UI_SESSION_KEY = 'jaleco-music:prep-ui-session:v1'
+const ANALYTICS_USER_KEY = 'jaleco-music:analytics-user:v1'
+const AB_ASSIGNMENTS_KEY = 'jaleco-music:ab-assignments:v1'
+const AB_EXPOSURE_KEY = 'jaleco-music:ab-exposure:v1'
+
+const MODE_HELP: Record<StudyMode | 'blind', string> = {
+  'with-translation': 'Muestra original y traducción para entrar rápido en contexto.',
+  'without-translation': 'Oculta traducción para forzar comprensión directa.',
+  interactive: 'Resalta preguntas para practicar respuesta en voz alta.',
+  blind: 'Difumina el texto y prioriza entrenamiento auditivo.',
+}
+
+const PRESET_LABELS: Record<PresetKey, string> = {
+  'quick-start': 'Repaso rápido',
+  'without-translation': 'Reto mental',
+  blind: 'Inmersión auditiva',
+  interactive: 'Práctica oral',
+}
+
+const PRESET_CONFIGS: Record<PresetKey, PresetConfig> = {
+  'quick-start': {
+    studyMode: 'with-translation',
+    blindMode: false,
+    playbackRate: 1,
+    repeatTarget: 10,
+    focusMode: true,
+    countdownEnabled: true,
+  },
+  'without-translation': {
+    studyMode: 'without-translation',
+    blindMode: false,
+    playbackRate: 1,
+    repeatTarget: 20,
+  },
+  blind: {
+    studyMode: 'without-translation',
+    blindMode: true,
+    playbackRate: 1,
+    repeatTarget: 20,
+    focusMode: true,
+  },
+  interactive: {
+    studyMode: 'interactive',
+    blindMode: false,
+    playbackRate: 1,
+    repeatTarget: 20,
+  },
+}
+
+const EXPERIMENT_DEFINITIONS: Record<
+  ExperimentKey,
+  {
+    name: string
+    primaryMetric: string
+    secondaryMetric: string
+  }
+> = {
+  prep_sticky_footer: {
+    name: 'Footer sticky de preparación',
+    primaryMetric: 'prep_click_start_live',
+    secondaryMetric: 'live_started',
+  },
+  prep_audio_collapsed: {
+    name: 'Audio colapsado por defecto',
+    primaryMetric: 'prep_audio_expand',
+    secondaryMetric: 'prep_click_start_live',
+  },
+  prep_quick_presets: {
+    name: 'Presets de inicio rápido',
+    primaryMetric: 'prep_change_setting',
+    secondaryMetric: 'live_started',
+  },
+  prep_advanced_settings: {
+    name: 'Ajustes avanzados colapsables',
+    primaryMetric: 'prep_change_setting',
+    secondaryMetric: 'prep_click_start_live',
+  },
+  prep_mode_tooltips: {
+    name: 'Ayuda contextual de modos',
+    primaryMetric: 'prep_change_setting',
+    secondaryMetric: 'live_started',
+  },
+}
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value))
@@ -315,6 +442,171 @@ const buildManualCues = (drafts: CueDraft[], starts: number[], totalDuration: nu
 const isInteractiveTarget = (target: EventTarget | null): boolean =>
   target instanceof HTMLElement && Boolean(target.closest('[data-interactive="true"]'))
 
+const readStorage = (storage: Storage, key: string): string | null => {
+  try {
+    return storage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+const writeStorage = (storage: Storage, key: string, value: string): void => {
+  try {
+    storage.setItem(key, value)
+  } catch {
+    // Ignore storage write errors.
+  }
+}
+
+const createStableId = (): string =>
+  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
+
+const hashString = (input: string): number => {
+  let hash = 0
+
+  for (let index = 0; index < input.length; index += 1) {
+    hash = (hash * 31 + input.charCodeAt(index)) | 0
+  }
+
+  return Math.abs(hash)
+}
+
+const getOrCreateAnalyticsUserId = (): string => {
+  if (typeof window === 'undefined') {
+    return 'server-render'
+  }
+
+  const stored = readStorage(window.localStorage, ANALYTICS_USER_KEY)
+  if (stored) {
+    return stored
+  }
+
+  const next = createStableId()
+  writeStorage(window.localStorage, ANALYTICS_USER_KEY, next)
+  return next
+}
+
+const resolveExperimentAssignments = (userId: string): ExperimentAssignments => {
+  if (typeof window === 'undefined') {
+    return {
+      prep_sticky_footer: 'control',
+      prep_audio_collapsed: 'control',
+      prep_quick_presets: 'control',
+      prep_advanced_settings: 'control',
+      prep_mode_tooltips: 'control',
+    }
+  }
+
+  const fallback = (experiment: ExperimentKey): ExperimentVariant =>
+    hashString(`${userId}:${experiment}`) % 2 === 0 ? 'control' : 'variant'
+
+  const raw = readStorage(window.localStorage, AB_ASSIGNMENTS_KEY)
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as {
+        userId?: string
+        assignments?: Partial<Record<ExperimentKey, ExperimentVariant>>
+      }
+
+      if (parsed.userId === userId && parsed.assignments) {
+        return {
+          prep_sticky_footer: parsed.assignments.prep_sticky_footer ?? fallback('prep_sticky_footer'),
+          prep_audio_collapsed:
+            parsed.assignments.prep_audio_collapsed ?? fallback('prep_audio_collapsed'),
+          prep_quick_presets:
+            parsed.assignments.prep_quick_presets ?? fallback('prep_quick_presets'),
+          prep_advanced_settings:
+            parsed.assignments.prep_advanced_settings ?? fallback('prep_advanced_settings'),
+          prep_mode_tooltips:
+            parsed.assignments.prep_mode_tooltips ?? fallback('prep_mode_tooltips'),
+        }
+      }
+    } catch {
+      // Ignore malformed assignment payloads.
+    }
+  }
+
+  const computed: ExperimentAssignments = {
+    prep_sticky_footer: fallback('prep_sticky_footer'),
+    prep_audio_collapsed: fallback('prep_audio_collapsed'),
+    prep_quick_presets: fallback('prep_quick_presets'),
+    prep_advanced_settings: fallback('prep_advanced_settings'),
+    prep_mode_tooltips: fallback('prep_mode_tooltips'),
+  }
+
+  writeStorage(
+    window.localStorage,
+    AB_ASSIGNMENTS_KEY,
+    JSON.stringify({ userId, assignments: computed }),
+  )
+
+  return computed
+}
+
+type ChipSelectableProps = {
+  selected: boolean
+  children: ReactNode
+  onClick?: () => void
+  disabled?: boolean
+  role?: AriaRole
+  ariaChecked?: boolean
+  ariaSelected?: boolean
+  ariaPressed?: boolean
+  ariaExpanded?: boolean
+  ariaControls?: string
+  ariaLabel?: string
+  ariaDescribedBy?: string
+  title?: string
+  dataHelp?: string
+  className?: string
+  type?: 'button' | 'submit' | 'reset'
+  dataInteractive?: boolean
+}
+
+const ChipSelectable = ({
+  selected,
+  children,
+  onClick,
+  disabled = false,
+  role,
+  ariaChecked,
+  ariaSelected,
+  ariaPressed,
+  ariaExpanded,
+  ariaControls,
+  ariaLabel,
+  ariaDescribedBy,
+  title,
+  dataHelp,
+  className,
+  type = 'button',
+  dataInteractive = true,
+}: ChipSelectableProps) => {
+  const chipClassName = [selected ? 'chip is-active' : 'chip', className].filter(Boolean).join(' ')
+
+  return (
+    <button
+      type={type}
+      role={role}
+      aria-checked={ariaChecked}
+      aria-selected={ariaSelected}
+      aria-pressed={ariaPressed}
+      aria-expanded={ariaExpanded}
+      aria-controls={ariaControls}
+      aria-label={ariaLabel}
+      aria-describedby={ariaDescribedBy}
+      title={title}
+      data-help={dataHelp}
+      className={chipClassName}
+      onClick={onClick}
+      disabled={disabled}
+      data-interactive={dataInteractive ? 'true' : undefined}
+    >
+      {children}
+    </button>
+  )
+}
+
 function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('prep')
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus>('stopped')
@@ -340,9 +632,13 @@ function App() {
   const [audioUrl, setAudioUrl] = useState('')
   const [audioLabel, setAudioLabel] = useState('Sin audio (modo lectura)')
   const [audioDurationSec, setAudioDurationSec] = useState(0)
+  const [isAudioExpanded, setIsAudioExpanded] = useState(false)
   const [gestureMessage, setGestureMessage] = useState('')
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [prepEditorTab, setPrepEditorTab] = useState<PrepEditorTab>('text')
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
+  const [activePreset, setActivePreset] = useState<PresetKey | null>(null)
+  const [isPresetModified, setIsPresetModified] = useState(false)
   const [syncMode, setSyncMode] = useState<SyncMode>('auto')
   const [manualStarts, setManualStarts] = useState<number[]>([])
   const [timingCursor, setTimingCursor] = useState(0)
@@ -350,6 +646,11 @@ function App() {
   const [timeInputDrafts, setTimeInputDrafts] = useState<Record<number, string>>({})
   const [isPrepAudioPlaying, setIsPrepAudioPlaying] = useState(false)
   const [prepStateHydrated, setPrepStateHydrated] = useState(false)
+  const analyticsUserId = useMemo(() => getOrCreateAnalyticsUserId(), [])
+  const experimentAssignments = useMemo(
+    () => resolveExperimentAssignments(analyticsUserId),
+    [analyticsUserId],
+  )
 
   const showTranslation = studyMode === 'with-translation'
   const studyModeLabel =
@@ -360,10 +661,10 @@ function App() {
         : 'Interactivo'
   const studyModeHint =
     studyMode === 'with-translation'
-      ? 'Lee EN y ES un par de veces.'
+      ? 'Original + traducción para arrancar con soporte visual.'
       : studyMode === 'without-translation'
-        ? 'Solo EN. Enfócate en entender sin ayuda.'
-        : 'Responde YES/NO después de cada pregunta.'
+        ? 'Solo original, sin traducción.'
+        : 'Interactúa con preguntas y responde en voz alta.'
 
   const stageRef = useRef<HTMLDivElement | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -380,6 +681,11 @@ function App() {
   })
   const endLockRef = useRef(false)
   const lastActiveCueRef = useRef(-1)
+  const prepViewTrackedRef = useRef(false)
+  const liveStartedTrackedRef = useRef(false)
+  const prepAbandonTrackedRef = useRef(false)
+  const exposedExperimentsRef = useRef<Set<ExperimentKey>>(new Set())
+  const previousSettingsRef = useRef<Record<string, string | number | boolean | null> | null>(null)
 
   const gestureStateRef = useRef<GestureState>({
     pointerId: null,
@@ -457,35 +763,57 @@ function App() {
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(PREP_STORAGE_KEY)
-      if (!raw) {
-        return
+      if (raw) {
+        const persisted = JSON.parse(raw) as PrepPersistedState
+        if (typeof persisted.lyrics === 'string') {
+          setLyrics(persisted.lyrics)
+        }
+        if (typeof persisted.pairImportMode === 'boolean') {
+          setPairImportMode(persisted.pairImportMode)
+        }
+        if (persisted.syncMode === 'auto' || persisted.syncMode === 'manual') {
+          setSyncMode(persisted.syncMode)
+        }
+        if (
+          persisted.studyMode === 'with-translation' ||
+          persisted.studyMode === 'without-translation' ||
+          persisted.studyMode === 'interactive'
+        ) {
+          setStudyMode(persisted.studyMode)
+        }
+        if (typeof persisted.blindMode === 'boolean') {
+          setBlindMode(persisted.blindMode)
+        }
+        if (Array.isArray(persisted.manualStarts)) {
+          const starts = persisted.manualStarts
+            .map((value) => Number(value))
+            .filter((value) => Number.isFinite(value))
+          setManualStarts(starts)
+        }
       }
 
-      const persisted = JSON.parse(raw) as PrepPersistedState
-      if (typeof persisted.lyrics === 'string') {
-        setLyrics(persisted.lyrics)
-      }
-      if (typeof persisted.pairImportMode === 'boolean') {
-        setPairImportMode(persisted.pairImportMode)
-      }
-      if (persisted.syncMode === 'auto' || persisted.syncMode === 'manual') {
-        setSyncMode(persisted.syncMode)
-      }
-      if (
-        persisted.studyMode === 'with-translation' ||
-        persisted.studyMode === 'without-translation' ||
-        persisted.studyMode === 'interactive'
-      ) {
-        setStudyMode(persisted.studyMode)
-      }
-      if (typeof persisted.blindMode === 'boolean') {
-        setBlindMode(persisted.blindMode)
-      }
-      if (Array.isArray(persisted.manualStarts)) {
-        const starts = persisted.manualStarts
-          .map((value) => Number(value))
-          .filter((value) => Number.isFinite(value))
-        setManualStarts(starts)
+      const rawSession = readStorage(window.sessionStorage, PREP_UI_SESSION_KEY)
+      if (rawSession) {
+        const session = JSON.parse(rawSession) as PrepUiSessionState
+        if (typeof session.audioExpanded === 'boolean') {
+          setIsAudioExpanded(session.audioExpanded)
+        }
+        if (typeof session.advancedExpanded === 'boolean') {
+          setIsAdvancedOpen(session.advancedExpanded)
+        }
+        if (
+          session.preset === 'quick-start' ||
+          session.preset === 'without-translation' ||
+          session.preset === 'blind' ||
+          session.preset === 'interactive'
+        ) {
+          setActivePreset(session.preset)
+          if (typeof session.presetModified === 'boolean') {
+            setIsPresetModified(session.presetModified)
+          }
+        } else {
+          setIsPresetModified(false)
+        }
       }
     } catch {
       // Ignore malformed local state and keep defaults.
@@ -514,6 +842,21 @@ function App() {
       // Ignore persistence errors (private mode / storage limits).
     }
   }, [blindMode, lyrics, normalizedManualStarts, pairImportMode, prepStateHydrated, studyMode, syncMode])
+
+  useEffect(() => {
+    if (!prepStateHydrated || typeof window === 'undefined') {
+      return
+    }
+
+    const payload: PrepUiSessionState = {
+      audioExpanded: isAudioExpanded,
+      advancedExpanded: isAdvancedOpen,
+      preset: activePreset ?? undefined,
+      presetModified: isPresetModified,
+    }
+
+    writeStorage(window.sessionStorage, PREP_UI_SESSION_KEY, JSON.stringify(payload))
+  }, [activePreset, isAdvancedOpen, isAudioExpanded, isPresetModified, prepStateHydrated])
 
   useEffect(() => {
     setTimingCursor((current) => clamp(current, 0, Math.max(cueDrafts.length - 1, 0)))
@@ -583,6 +926,241 @@ function App() {
 
   const remainingLoops =
     repeatTarget === 'inf' ? null : Math.max(repeatTarget - completedLoops, 0)
+
+  const canEditTimings = Boolean(audioUrl) || isAdvancedOpen
+
+  const trackEvent = useCallback(
+    (eventName: FunnelEventName, payload: Record<string, unknown> = {}) => {
+      if (typeof window === 'undefined') {
+        return
+      }
+
+      const eventPayload = {
+        event: eventName,
+        source: 'prep_screen',
+        view_mode: viewMode,
+        user_id: analyticsUserId,
+        ts: new Date().toISOString(),
+        experiments: experimentAssignments,
+        ...payload,
+      }
+
+      window.dataLayer = window.dataLayer ?? []
+      window.dataLayer.push(eventPayload)
+      window.dispatchEvent(
+        new CustomEvent('jaleco:analytics', {
+          detail: eventPayload,
+        }),
+      )
+    },
+    [analyticsUserId, experimentAssignments, viewMode],
+  )
+
+  const prepSettingsSnapshot = useMemo(
+    () => ({
+      pair_import_mode: pairImportMode,
+      study_mode: studyMode,
+      blind_mode: blindMode,
+      repeat_target: repeatTarget === 'inf' ? 'inf' : `${repeatTarget}`,
+      playback_rate: playbackRate,
+      sync_mode: syncMode,
+      editor_tab: prepEditorTab,
+      audio_loaded: Boolean(audioUrl),
+      audio_expanded: isAudioExpanded,
+      advanced_open: isAdvancedOpen,
+      preset: activePreset ?? 'none',
+      preset_modified: isPresetModified,
+      countdown_enabled: countdownEnabled,
+      haptic_enabled: hapticEnabled,
+      line_spacing: lineSpacing,
+      font_level: fontLevel,
+      dark_mode: darkMode,
+      focus_mode: focusMode,
+    }),
+    [
+      activePreset,
+      audioUrl,
+      blindMode,
+      countdownEnabled,
+      darkMode,
+      focusMode,
+      fontLevel,
+      hapticEnabled,
+      isAdvancedOpen,
+      isAudioExpanded,
+      isPresetModified,
+      lineSpacing,
+      pairImportMode,
+      playbackRate,
+      repeatTarget,
+      studyMode,
+      syncMode,
+      prepEditorTab,
+    ],
+  )
+
+  const presetOutOfSync = useMemo(() => {
+    if (!activePreset) {
+      return false
+    }
+
+    const config = PRESET_CONFIGS[activePreset]
+    if (studyMode !== config.studyMode) {
+      return true
+    }
+    if (blindMode !== config.blindMode) {
+      return true
+    }
+    if (playbackRate !== config.playbackRate) {
+      return true
+    }
+    if (repeatTarget !== config.repeatTarget) {
+      return true
+    }
+    if (typeof config.focusMode === 'boolean' && focusMode !== config.focusMode) {
+      return true
+    }
+    if (typeof config.countdownEnabled === 'boolean' && countdownEnabled !== config.countdownEnabled) {
+      return true
+    }
+
+    return false
+  }, [
+    activePreset,
+    blindMode,
+    countdownEnabled,
+    focusMode,
+    playbackRate,
+    repeatTarget,
+    studyMode,
+  ])
+
+  useEffect(() => {
+    if (!activePreset || isPresetModified) {
+      return
+    }
+
+    if (presetOutOfSync) {
+      setIsPresetModified(true)
+    }
+  }, [activePreset, isPresetModified, presetOutOfSync])
+
+  useEffect(() => {
+    if (!canEditTimings && prepEditorTab === 'timing') {
+      setPrepEditorTab('text')
+    }
+  }, [canEditTimings, prepEditorTab])
+
+  useEffect(() => {
+    if (!prepStateHydrated || viewMode !== 'prep') {
+      prepViewTrackedRef.current = false
+      return
+    }
+
+    if (prepViewTrackedRef.current) {
+      return
+    }
+
+    prepViewTrackedRef.current = true
+    prepAbandonTrackedRef.current = false
+
+    trackEvent('prep_view', {
+      frases: cues.length,
+      duracion_vuelta: Number(totalDuration.toFixed(2)),
+      repeticiones: repeatTarget === 'inf' ? 'inf' : repeatTarget,
+      audio_cargado: Boolean(audioUrl),
+    })
+  }, [audioUrl, cues.length, prepStateHydrated, repeatTarget, totalDuration, trackEvent, viewMode])
+
+  useEffect(() => {
+    const snapshot = prepSettingsSnapshot as Record<string, string | number | boolean | null>
+
+    if (!prepStateHydrated || viewMode !== 'prep') {
+      previousSettingsRef.current = snapshot
+      return
+    }
+
+    const previous = previousSettingsRef.current
+    if (!previous) {
+      previousSettingsRef.current = snapshot
+      return
+    }
+
+    ;(Object.keys(snapshot) as Array<keyof typeof snapshot>).forEach((key) => {
+      if (previous[key] === snapshot[key]) {
+        return
+      }
+
+      trackEvent('prep_change_setting', {
+        setting: key,
+        value: snapshot[key],
+      })
+    })
+
+    previousSettingsRef.current = snapshot
+  }, [prepSettingsSnapshot, prepStateHydrated, trackEvent, viewMode])
+
+  useEffect(() => {
+    if (!prepStateHydrated || typeof window === 'undefined') {
+      return
+    }
+
+    const rawExposed = readStorage(window.sessionStorage, AB_EXPOSURE_KEY)
+    let exposed = new Set<ExperimentKey>()
+
+    if (rawExposed) {
+      try {
+        exposed = new Set(JSON.parse(rawExposed) as ExperimentKey[])
+      } catch {
+        exposed = new Set<ExperimentKey>()
+      }
+    }
+
+    ;(Object.keys(experimentAssignments) as ExperimentKey[]).forEach((experimentKey) => {
+      if (exposed.has(experimentKey) || exposedExperimentsRef.current.has(experimentKey)) {
+        return
+      }
+
+      const definition = EXPERIMENT_DEFINITIONS[experimentKey]
+      const variant = experimentAssignments[experimentKey]
+
+      trackEvent('ab_exposure', {
+        experiment_key: experimentKey,
+        experiment_name: definition.name,
+        variant,
+        metric_primary: definition.primaryMetric,
+        metric_secondary: definition.secondaryMetric,
+      })
+
+      exposedExperimentsRef.current.add(experimentKey)
+      exposed.add(experimentKey)
+    })
+
+    writeStorage(window.sessionStorage, AB_EXPOSURE_KEY, JSON.stringify(Array.from(exposed)))
+  }, [experimentAssignments, prepStateHydrated, trackEvent])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const handlePageHide = () => {
+      if (viewMode !== 'prep' || liveStartedTrackedRef.current || prepAbandonTrackedRef.current) {
+        return
+      }
+
+      prepAbandonTrackedRef.current = true
+      trackEvent('prep_abandon', {
+        frases: cues.length,
+        audio_cargado: Boolean(audioUrl),
+      })
+    }
+
+    window.addEventListener('pagehide', handlePageHide)
+    return () => {
+      window.removeEventListener('pagehide', handlePageHide)
+    }
+  }, [audioUrl, cues.length, trackEvent, viewMode])
 
   const setGestureFeedback = useCallback((message: string) => {
     setGestureMessage(message)
@@ -674,7 +1252,7 @@ function App() {
     })
 
     setTimingCursor(Math.min(index + 1, cueDrafts.length - 1))
-    showTimingNotice(`Cue ${index + 1} en ${formatTimeWithCentiseconds(markedTime)}`)
+    showTimingNotice(`Frase ${index + 1} en ${formatTimeWithCentiseconds(markedTime)}`)
   }, [cueDrafts.length, mutateManualStarts, readEditorTimeSec, showTimingNotice, timingCursor])
 
   const markEndAtCursor = useCallback(() => {
@@ -684,7 +1262,7 @@ function App() {
 
     const index = clamp(timingCursor, 0, cueDrafts.length - 1)
     if (index >= cueDrafts.length - 1) {
-      showTimingNotice('El último cue termina al final del audio.')
+      showTimingNotice('La última frase termina al final del audio.')
       return
     }
 
@@ -695,7 +1273,7 @@ function App() {
     })
 
     setTimingCursor(index + 1)
-    showTimingNotice(`Fin cue ${index + 1} en ${formatTimeWithCentiseconds(markedTime)}`)
+    showTimingNotice(`Fin frase ${index + 1} en ${formatTimeWithCentiseconds(markedTime)}`)
   }, [cueDrafts.length, mutateManualStarts, readEditorTimeSec, showTimingNotice, timingCursor])
 
   const shiftFromCursor = useCallback(
@@ -712,7 +1290,7 @@ function App() {
       })
 
       showTimingNotice(
-        `Shift ${delta >= 0 ? '+' : ''}${delta.toFixed(1)}s desde cue ${fromIndex + 1}`,
+        `Mover ${delta >= 0 ? '+' : ''}${delta.toFixed(1)}s desde frase ${fromIndex + 1}`,
       )
     },
     [cueDrafts.length, mutateManualStarts, showTimingNotice, timingCursor],
@@ -757,7 +1335,7 @@ function App() {
         starts[index] = bounded
       })
       clearTimeInputDraft(index)
-      showTimingNotice(`Cue ${index + 1} ajustado a ${formatTimeWithCentiseconds(bounded)}`)
+      showTimingNotice(`Frase ${index + 1} ajustada a ${formatTimeWithCentiseconds(bounded)}`)
     },
     [clearTimeInputDraft, mutateManualStarts, showTimingNotice, timeInputDrafts],
   )
@@ -904,6 +1482,24 @@ function App() {
       return
     }
 
+    if (!liveStartedTrackedRef.current) {
+      liveStartedTrackedRef.current = true
+      prepAbandonTrackedRef.current = true
+
+      trackEvent('live_started', {
+        frases: cues.length,
+        repeticiones: repeatTargetRef.current === 'inf' ? 'inf' : repeatTargetRef.current,
+      })
+
+      ;(Object.keys(experimentAssignments) as ExperimentKey[]).forEach((experimentKey) => {
+        trackEvent('ab_conversion', {
+          experiment_key: experimentKey,
+          variant: experimentAssignments[experimentKey],
+          conversion_event: 'live_started',
+        })
+      })
+    }
+
     setPlaybackStatus('playing')
     setControlsVisible(true)
 
@@ -919,7 +1515,7 @@ function App() {
         setPlaybackStatus('paused')
       }
     }
-  }, [audioUrl, cues.length, playbackRate, playheadSec, volume])
+  }, [audioUrl, cues.length, experimentAssignments, playbackRate, playheadSec, trackEvent, volume])
 
   const resetSession = useCallback(() => {
     setPlaybackStatus('stopped')
@@ -938,6 +1534,7 @@ function App() {
 
   const handleBackToPreparation = useCallback(() => {
     resetSession()
+    liveStartedTrackedRef.current = false
     setViewMode('prep')
   }, [resetSession])
 
@@ -984,6 +1581,39 @@ function App() {
     playbackStatus,
     playheadSec,
     startPlaybackNow,
+    viewMode,
+  ])
+
+  const handlePrepStart = useCallback(() => {
+    if (viewMode !== 'prep') {
+      togglePlayback()
+      return
+    }
+
+    trackEvent('prep_click_start_live', {
+      frases: cues.length,
+      duracion_vuelta: Number(totalDuration.toFixed(2)),
+      repeticiones: repeatTarget === 'inf' ? 'inf' : repeatTarget,
+      audio_cargado: Boolean(audioUrl),
+    })
+
+    ;(Object.keys(experimentAssignments) as ExperimentKey[]).forEach((experimentKey) => {
+      trackEvent('ab_conversion', {
+        experiment_key: experimentKey,
+        variant: experimentAssignments[experimentKey],
+        conversion_event: 'prep_click_start_live',
+      })
+    })
+
+    togglePlayback()
+  }, [
+    audioUrl,
+    cues.length,
+    experimentAssignments,
+    repeatTarget,
+    togglePlayback,
+    totalDuration,
+    trackEvent,
     viewMode,
   ])
 
@@ -1051,6 +1681,39 @@ function App() {
     [enforceTranslationRepeatFloor],
   )
 
+  const applyPreset = useCallback(
+    (preset: PresetKey) => {
+      const config = PRESET_CONFIGS[preset]
+
+      applyStudyMode(config.studyMode)
+      setBlindMode(config.blindMode)
+      setPlaybackRate(config.playbackRate as (typeof SPEED_OPTIONS)[number])
+      applyRepeatTarget(config.repeatTarget)
+      if (typeof config.focusMode === 'boolean') {
+        setFocusMode(config.focusMode)
+      }
+      if (typeof config.countdownEnabled === 'boolean') {
+        setCountdownEnabled(config.countdownEnabled)
+      }
+
+      setActivePreset(preset)
+      setIsPresetModified(false)
+    },
+    [applyRepeatTarget, applyStudyMode],
+  )
+
+  const toggleAudioPanel = useCallback(() => {
+    setIsAudioExpanded((current) => {
+      const next = !current
+      if (next) {
+        trackEvent('prep_audio_expand', {
+          audio_cargado: Boolean(audioUrl),
+        })
+      }
+      return next
+    })
+  }, [audioUrl, trackEvent])
+
   const handlePairImportModeChange = (next: boolean) => {
     if (pairImportMode === next) {
       return
@@ -1062,7 +1725,7 @@ function App() {
       setManualStarts([])
       setTimingCursor(0)
       setTimeInputDrafts({})
-      showTimingNotice('Cambió el conteo de cues. Se regeneraron tiempos automáticos.')
+      showTimingNotice('Cambió el conteo de frases. Se regeneraron tiempos automáticos.')
     }
 
     setPairImportMode(next)
@@ -1077,7 +1740,7 @@ function App() {
       setManualStarts([])
       setTimingCursor(0)
       setTimeInputDrafts({})
-      showTimingNotice('Cambió el conteo de cues. Se regeneraron tiempos automáticos.')
+      showTimingNotice('Cambió el conteo de frases. Se regeneraron tiempos automáticos.')
     }
 
     setLyrics(nextLyrics)
@@ -1541,33 +2204,41 @@ function App() {
               <h1>Escucha y lee la historia</h1>
             </div>
             <button className="ghost-button" onClick={toggleFullscreen} data-interactive="true" type="button">
-              {isFullscreen ? 'Salir Fullscreen' : 'Fullscreen'}
+              {isFullscreen ? 'Salir pantalla completa' : 'Pantalla completa'}
             </button>
           </header>
 
           <div className="prep-grid">
             <div className="field prep-editor">
               <div className="field-header">
-                <span>Texto / letras</span>
+                <span>Texto / frases</span>
                 <div className="chip-row compact prep-editor-tabs" role="tablist" aria-label="Editor de preparación">
-                  <button
-                    type="button"
-                    className={prepEditorTab === 'text' ? 'chip is-active' : 'chip'}
+                  <ChipSelectable
+                    selected={prepEditorTab === 'text'}
                     onClick={() => setPrepEditorTab('text')}
-                    data-interactive="true"
+                    role="tab"
+                    ariaSelected={prepEditorTab === 'text'}
                   >
                     Editar texto
-                  </button>
-                  <button
-                    type="button"
-                    className={prepEditorTab === 'timing' ? 'chip is-active' : 'chip'}
-                    onClick={() => setPrepEditorTab('timing')}
-                    data-interactive="true"
-                  >
-                    Editar tiempos
-                  </button>
+                  </ChipSelectable>
+                  {canEditTimings && (
+                    <ChipSelectable
+                      selected={prepEditorTab === 'timing'}
+                      onClick={() => setPrepEditorTab('timing')}
+                      role="tab"
+                      ariaSelected={prepEditorTab === 'timing'}
+                    >
+                      Editar tiempos
+                    </ChipSelectable>
+                  )}
                 </div>
               </div>
+
+              {!canEditTimings && (
+                <p className="field-hint">
+                  Editar tiempos se habilita al cargar audio o al abrir Ajustes avanzados.
+                </p>
+              )}
 
               {prepEditorTab === 'text' && (
                 <>
@@ -1582,22 +2253,22 @@ function App() {
                     data-interactive="true"
                   />
                   <div className="chip-row compact" role="radiogroup" aria-label="Modo de importación">
-                    <button
-                      type="button"
-                      className={pairImportMode ? 'chip' : 'chip is-active'}
+                    <ChipSelectable
+                      selected={!pairImportMode}
                       onClick={() => handlePairImportModeChange(false)}
-                      data-interactive="true"
+                      role="radio"
+                      ariaChecked={!pairImportMode}
                     >
-                      1 línea = 1 cue
-                    </button>
-                    <button
-                      type="button"
-                      className={pairImportMode ? 'chip is-active' : 'chip'}
+                      1 línea = 1 frase
+                    </ChipSelectable>
+                    <ChipSelectable
+                      selected={pairImportMode}
                       onClick={() => handlePairImportModeChange(true)}
-                      data-interactive="true"
+                      role="radio"
+                      ariaChecked={pairImportMode}
                     >
                       EN/ES alternado
-                    </button>
+                    </ChipSelectable>
                   </div>
                   {pairImportMode && (
                     <p className="field-hint">
@@ -1611,35 +2282,31 @@ function App() {
                 <div className="timing-editor">
                   <div className="timing-toolbar">
                     <p className="field-hint">
-                      {syncMode === 'manual' ? 'Sincronía manual activa' : 'Sincronía automática estimada'}
+                      {syncMode === 'manual'
+                        ? 'Sincronización manual activa'
+                        : 'Sincronización automática estimada'}
                     </p>
                     <div className="chip-row compact">
-                      <button
-                        type="button"
-                        className={syncMode === 'auto' ? 'chip is-active' : 'chip'}
+                      <ChipSelectable
+                        selected={syncMode === 'auto'}
                         onClick={restoreAutoSync}
-                        data-interactive="true"
                       >
-                        Auto
-                      </button>
-                      <button
-                        type="button"
-                        className="chip"
+                        Automática
+                      </ChipSelectable>
+                      <ChipSelectable
+                        selected={false}
                         onClick={() => shiftFromCursor(-SHIFT_STEP_SEC)}
                         disabled={cueDrafts.length === 0}
-                        data-interactive="true"
                       >
-                        Shift -0.2s
-                      </button>
-                      <button
-                        type="button"
-                        className="chip"
+                        Mover -0.2 s
+                      </ChipSelectable>
+                      <ChipSelectable
+                        selected={false}
                         onClick={() => shiftFromCursor(SHIFT_STEP_SEC)}
                         disabled={cueDrafts.length === 0}
-                        data-interactive="true"
                       >
-                        Shift +0.2s
-                      </button>
+                        Mover +0.2 s
+                      </ChipSelectable>
                     </div>
                   </div>
 
@@ -1652,7 +2319,7 @@ function App() {
                         disabled={!audioUrl}
                         data-interactive="true"
                       >
-                        {isPrepAudioPlaying ? 'Pausa' : 'Play'}
+                        {isPrepAudioPlaying ? 'Pausa' : 'Reproducir'}
                       </button>
                       <button
                         className="ghost-button small"
@@ -1719,14 +2386,12 @@ function App() {
                         className={index === timingCursor ? 'timing-row is-active' : 'timing-row'}
                       >
                         <div className="timing-row-head">
-                          <button
-                            type="button"
-                            className={index === timingCursor ? 'chip is-active' : 'chip'}
+                          <ChipSelectable
+                            selected={index === timingCursor}
                             onClick={() => selectCueForTiming(index)}
-                            data-interactive="true"
                           >
-                            Cue {index + 1}
-                          </button>
+                            Frase {index + 1}
+                          </ChipSelectable>
                           <span className="timing-row-end">Fin {formatTimeWithCentiseconds(cue.end)}</span>
                         </div>
 
@@ -1750,28 +2415,24 @@ function App() {
                   </div>
 
                   {cuesForEditor.length === 0 && (
-                    <p className="field-hint">Agrega texto para generar cues y empezar a sincronizar.</p>
+                    <p className="field-hint">Agrega texto para generar frases y empezar a sincronizar.</p>
                   )}
 
                   <div className="chip-row compact">
-                    <button
-                      type="button"
-                      className="chip"
+                    <ChipSelectable
+                      selected={false}
                       onClick={() => exportCurrentCues('vtt')}
                       disabled={cuesForEditor.length === 0}
-                      data-interactive="true"
                     >
-                      Exportar .vtt
-                    </button>
-                    <button
-                      type="button"
-                      className="chip"
+                      Exportar subtítulos (.vtt)
+                    </ChipSelectable>
+                    <ChipSelectable
+                      selected={false}
                       onClick={() => exportCurrentCues('srt')}
                       disabled={cuesForEditor.length === 0}
-                      data-interactive="true"
                     >
-                      Exportar .srt
-                    </button>
+                      Exportar subtítulos (.srt)
+                    </ChipSelectable>
                   </div>
 
                   {timingNotice && <p className="timing-notice">{timingNotice}</p>}
@@ -1782,76 +2443,127 @@ function App() {
             <div className="panel-card">
               <p className="panel-title">Ritmo y repetición</p>
 
-              <div className="chip-row" role="radiogroup" aria-label="Modo de estudio">
-                <button
-                  type="button"
+              <p className="field-hint">1. Para qué (presets)</p>
+              <div className="chip-row" role="radiogroup" aria-label="Presets por objetivo">
+                {(['quick-start', 'without-translation', 'blind', 'interactive'] as PresetKey[]).map((preset) => (
+                  <ChipSelectable
+                    key={preset}
+                    selected={activePreset === preset && !isPresetModified}
+                    role="radio"
+                    ariaChecked={activePreset === preset && !isPresetModified}
+                    onClick={() => applyPreset(preset)}
+                  >
+                    {PRESET_LABELS[preset]}
+                  </ChipSelectable>
+                ))}
+              </div>
+              {isPresetModified && (
+                <span className="chip is-active chip-static" aria-live="polite">
+                  Personalizado
+                </span>
+              )}
+              {activePreset && !isPresetModified && (
+                <p className="field-hint">
+                  Preset activo: {PRESET_LABELS[activePreset]}.
+                </p>
+              )}
+              {activePreset && isPresetModified && (
+                <p className="field-hint">
+                  Preset personalizado manualmente. Reaplica un preset para volver al estado base.
+                </p>
+              )}
+
+              <p className="field-hint">2. Personalizar (cómo)</p>
+
+              <div className="chip-row" role="radiogroup" aria-label="Modo de práctica">
+                <ChipSelectable
+                  selected={studyMode === 'with-translation'}
                   role="radio"
-                  aria-checked={studyMode === 'with-translation'}
-                  className={studyMode === 'with-translation' ? 'chip is-active' : 'chip'}
+                  ariaChecked={studyMode === 'with-translation'}
+                  ariaDescribedBy="mode-help-with-translation"
+                  data-help={MODE_HELP['with-translation']}
                   onClick={() => applyStudyMode('with-translation')}
-                  data-interactive="true"
                 >
                   Con traducción
-                </button>
-                <button
-                  type="button"
+                </ChipSelectable>
+                <ChipSelectable
+                  selected={studyMode === 'without-translation'}
                   role="radio"
-                  aria-checked={studyMode === 'without-translation'}
-                  className={studyMode === 'without-translation' ? 'chip is-active' : 'chip'}
+                  ariaChecked={studyMode === 'without-translation'}
+                  ariaDescribedBy="mode-help-without-translation"
+                  data-help={MODE_HELP['without-translation']}
                   onClick={() => applyStudyMode('without-translation')}
-                  data-interactive="true"
                 >
                   Sin traducción
-                </button>
-                <button
-                  type="button"
+                </ChipSelectable>
+                <ChipSelectable
+                  selected={studyMode === 'interactive'}
                   role="radio"
-                  aria-checked={studyMode === 'interactive'}
-                  className={studyMode === 'interactive' ? 'chip is-active' : 'chip'}
+                  ariaChecked={studyMode === 'interactive'}
+                  ariaDescribedBy="mode-help-interactive"
+                  data-help={MODE_HELP.interactive}
                   onClick={() => applyStudyMode('interactive')}
-                  data-interactive="true"
                 >
                   Interactivo
-                </button>
+                </ChipSelectable>
               </div>
-              <p className="field-hint study-mode-hint">{studyModeHint}</p>
 
-              <label className="study-toggle-row">
-                <input
-                  type="checkbox"
-                  checked={blindMode}
-                  onChange={(event) => setBlindMode(event.target.checked)}
-                  data-interactive="true"
-                />
-                A ciegas
-              </label>
-              {blindMode && <p className="field-hint study-mode-hint">Texto difuminado. Entrena oído.</p>}
+              <div className="chip-row" role="group" aria-label="Opciones de apoyo">
+                <ChipSelectable
+                  selected={blindMode}
+                  ariaPressed={blindMode}
+                  ariaDescribedBy="mode-help-blind"
+                  data-help={MODE_HELP.blind}
+                  onClick={() => setBlindMode((current) => !current)}
+                >
+                  A ciegas
+                </ChipSelectable>
+              </div>
+
+              <div className="study-help-shell" aria-live="polite">
+                <p className="field-hint study-mode-hint">
+                  {blindMode ? `${studyModeHint} A ciegas activo.` : studyModeHint}
+                </p>
+              </div>
+
+              <span id="mode-help-with-translation" className="sr-only">
+                {MODE_HELP['with-translation']}
+              </span>
+              <span id="mode-help-without-translation" className="sr-only">
+                {MODE_HELP['without-translation']}
+              </span>
+              <span id="mode-help-interactive" className="sr-only">
+                {MODE_HELP.interactive}
+              </span>
+              <span id="mode-help-blind" className="sr-only">
+                {MODE_HELP.blind}
+              </span>
 
               <div className="chip-row" role="radiogroup" aria-label="Velocidad">
                 {SPEED_OPTIONS.map((option) => (
-                  <button
+                  <ChipSelectable
                     key={option}
-                    type="button"
-                    className={playbackRate === option ? 'chip is-active' : 'chip'}
+                    selected={playbackRate === option}
+                    role="radio"
+                    ariaChecked={playbackRate === option}
                     onClick={() => setPlaybackRate(option)}
-                    data-interactive="true"
                   >
                     {option === 1 ? 'Normal' : `${option}x`}
-                  </button>
+                  </ChipSelectable>
                 ))}
               </div>
 
               <div className="chip-row" role="radiogroup" aria-label="Repeticiones">
                 {REPEAT_OPTIONS.map((option) => (
-                  <button
+                  <ChipSelectable
                     key={option}
-                    type="button"
-                    className={repeatTarget === option ? 'chip is-active' : 'chip'}
+                    selected={repeatTarget === option}
+                    role="radio"
+                    ariaChecked={repeatTarget === option}
                     onClick={() => applyRepeatTarget(option)}
-                    data-interactive="true"
                   >
                     {option === 'inf' ? '∞' : `x${option}`}
-                  </button>
+                  </ChipSelectable>
                 ))}
               </div>
 
@@ -1867,107 +2579,152 @@ function App() {
                   data-interactive="true"
                 />
               </label>
-
-              <div className="option-row">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={countdownEnabled}
-                    onChange={(event) => setCountdownEnabled(event.target.checked)}
-                    data-interactive="true"
-                  />
-                  Cuenta regresiva 3-2-1
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={hapticEnabled}
-                    onChange={(event) => setHapticEnabled(event.target.checked)}
-                    data-interactive="true"
-                  />
-                  Vibración por frase
-                </label>
-              </div>
             </div>
 
-            <div className="panel-card">
-              <p className="panel-title">Legibilidad</p>
-
-              <div className="chip-row" role="radiogroup" aria-label="Tamaño de texto">
-                {PREVIEW_FONT_LEVELS.map((size, index) => (
-                  <button
-                    key={size}
-                    type="button"
-                    className={fontLevel === index ? 'chip is-active' : 'chip'}
-                    onClick={() => setFontLevel(index)}
-                    data-interactive="true"
-                  >
-                    A{index + 1}
-                  </button>
-                ))}
-              </div>
-
-              <div className="chip-row" role="radiogroup" aria-label="Espaciado">
-                {(['compact', 'normal', 'relaxed'] as const).map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    className={lineSpacing === option ? 'chip is-active' : 'chip'}
-                    onClick={() => setLineSpacing(option)}
-                    data-interactive="true"
-                  >
-                    {option === 'compact' ? 'Compacto' : option === 'normal' ? 'Normal' : 'Relajado'}
-                  </button>
-                ))}
-              </div>
-
-              <div className="option-row">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={darkMode}
-                    onChange={(event) => setDarkMode(event.target.checked)}
-                    data-interactive="true"
-                  />
-                  Modo oscuro real
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={focusMode}
-                    onChange={(event) => setFocusMode(event.target.checked)}
-                    data-interactive="true"
-                  />
-                  Modo enfoque
-                </label>
-              </div>
-            </div>
-
-            <div className="panel-card">
-              <p className="panel-title">Audio (opcional)</p>
-
-              <label className="audio-upload" data-interactive="true">
-                <span>Cargar audio</span>
-                <input type="file" accept="audio/*" onChange={handleAudioUpload} />
-              </label>
-
-              <p className="audio-name">{audioLabel}</p>
-
-              {audioUrl && (
-                <button className="ghost-button small" onClick={removeAudio} type="button" data-interactive="true">
-                  Quitar audio
+            <div className="panel-card panel-collapsible">
+              <div className="panel-headline">
+                <p className="panel-title">Audio (opcional)</p>
+                <button
+                  type="button"
+                  className="ghost-button small"
+                  aria-expanded={isAudioExpanded}
+                  aria-controls="prep-audio-content"
+                  onClick={toggleAudioPanel}
+                  data-interactive="true"
+                >
+                  {isAudioExpanded ? 'Ocultar' : 'Mostrar'}
                 </button>
+              </div>
+
+              <p className="field-hint">
+                {audioUrl ? `Audio cargado: ${audioLabel}` : 'Sin audio cargado.'}
+              </p>
+
+              {isAudioExpanded && (
+                <div id="prep-audio-content" className="audio-panel-content">
+                  <label className="audio-upload" data-interactive="true">
+                    <span>Cargar audio</span>
+                    <input type="file" accept="audio/*" onChange={handleAudioUpload} />
+                  </label>
+
+                  <p className="audio-name">{audioLabel}</p>
+
+                  {audioUrl && (
+                    <button
+                      className="ghost-button small"
+                      onClick={removeAudio}
+                      type="button"
+                      data-interactive="true"
+                    >
+                      Quitar audio
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="panel-card panel-collapsible">
+              <div className="panel-headline">
+                <p className="panel-title">Ajustes avanzados</p>
+                <button
+                  type="button"
+                  className="ghost-button small"
+                  aria-expanded={isAdvancedOpen}
+                  aria-controls="prep-advanced-content"
+                  onClick={() => setIsAdvancedOpen((open) => !open)}
+                  data-interactive="true"
+                >
+                  {isAdvancedOpen ? 'Ocultar' : 'Mostrar'}
+                </button>
+              </div>
+
+              <p className="field-hint">
+                Incluye opciones de legibilidad, cuenta regresiva y vibración.
+              </p>
+
+              {isAdvancedOpen && (
+                <div id="prep-advanced-content" className="advanced-panel-content">
+                  <div className="chip-row" role="radiogroup" aria-label="Tamaño de texto">
+                    {PREVIEW_FONT_LEVELS.map((size, index) => (
+                      <ChipSelectable
+                        key={size}
+                        selected={fontLevel === index}
+                        role="radio"
+                        ariaChecked={fontLevel === index}
+                        onClick={() => setFontLevel(index)}
+                      >
+                        A{index + 1}
+                      </ChipSelectable>
+                    ))}
+                  </div>
+
+                  <div className="chip-row" role="radiogroup" aria-label="Espaciado">
+                    {(['compact', 'normal', 'relaxed'] as const).map((option) => (
+                      <ChipSelectable
+                        key={option}
+                        selected={lineSpacing === option}
+                        role="radio"
+                        ariaChecked={lineSpacing === option}
+                        onClick={() => setLineSpacing(option)}
+                      >
+                        {option === 'compact' ? 'Compacto' : option === 'normal' ? 'Normal' : 'Relajado'}
+                      </ChipSelectable>
+                    ))}
+                  </div>
+
+                  <div className="option-row">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={countdownEnabled}
+                        onChange={(event) => setCountdownEnabled(event.target.checked)}
+                        data-interactive="true"
+                      />
+                      Cuenta regresiva 3-2-1
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={hapticEnabled}
+                        onChange={(event) => setHapticEnabled(event.target.checked)}
+                        data-interactive="true"
+                      />
+                      Vibración por frase
+                    </label>
+                  </div>
+
+                  <div className="option-row">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={darkMode}
+                        onChange={(event) => setDarkMode(event.target.checked)}
+                        data-interactive="true"
+                      />
+                      Modo oscuro real
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={focusMode}
+                        onChange={(event) => setFocusMode(event.target.checked)}
+                        data-interactive="true"
+                      />
+                      Modo enfoque
+                    </label>
+                  </div>
+                </div>
               )}
             </div>
           </div>
 
           <footer className="prep-footer">
             <p>
-              {cues.length} cues · {formatTime(totalDuration)} por vuelta · Sync {syncMode === 'manual' ? 'manual' : 'auto'} ·{' '}
-              {repeatTarget === 'inf' ? '∞' : `x${repeatTarget}`}
+              {cues.length} frases · {formatTime(totalDuration)} por vuelta ·{' '}
+              {repeatTarget === 'inf' ? '∞ repeticiones' : `${repeatTarget} repeticiones`}
             </p>
-            <button className="primary-button" onClick={togglePlayback} type="button" data-interactive="true">
-              Iniciar Live
+            <button className="primary-button" onClick={handlePrepStart} type="button" data-interactive="true">
+              Comenzar práctica
             </button>
           </footer>
         </section>
@@ -2014,7 +2771,7 @@ function App() {
               </span>
 
               <button className="ghost-button small" onClick={toggleFullscreen} type="button" data-interactive="true">
-                {isFullscreen ? 'Salir' : 'Full'}
+                {isFullscreen ? 'Salir' : 'Pantalla'}
               </button>
             </header>
           )}
@@ -2081,34 +2838,34 @@ function App() {
           {controlsVisible && (
             <footer className="control-pill" data-interactive="true">
               <button className="play-button" type="button" onClick={togglePlayback} data-interactive="true">
-                {isActivePlayback ? 'Pausa' : 'Play'}
+                {isActivePlayback ? 'Pausa' : 'Reproducir'}
               </button>
 
               <div className="chip-row compact" role="radiogroup" aria-label="Velocidad" data-interactive="true">
                 {SPEED_OPTIONS.map((option) => (
-                  <button
+                  <ChipSelectable
                     key={option}
-                    type="button"
-                    className={playbackRate === option ? 'chip is-active' : 'chip'}
+                    selected={playbackRate === option}
+                    role="radio"
+                    ariaChecked={playbackRate === option}
                     onClick={() => setPlaybackRate(option)}
-                    data-interactive="true"
                   >
                     {option === 1 ? 'Normal' : `${option}x`}
-                  </button>
+                  </ChipSelectable>
                 ))}
               </div>
 
               <div className="chip-row compact" role="radiogroup" aria-label="Repeticiones" data-interactive="true">
                 {REPEAT_OPTIONS.map((option) => (
-                  <button
+                  <ChipSelectable
                     key={option}
-                    type="button"
-                    className={repeatTarget === option ? 'chip is-active' : 'chip'}
+                    selected={repeatTarget === option}
+                    role="radio"
+                    ariaChecked={repeatTarget === option}
                     onClick={() => applyRepeatTarget(option)}
-                    data-interactive="true"
                   >
                     {option === 'inf' ? '∞' : `x${option}`}
-                  </button>
+                  </ChipSelectable>
                 ))}
               </div>
 
