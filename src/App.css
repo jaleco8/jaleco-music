@@ -141,6 +141,10 @@
   color: var(--text-muted);
 }
 
+.study-mode-hint {
+  margin-top: -0.1rem;
+}
+
 .timing-editor {
   display: flex;
   flex-direction: column;
@@ -326,6 +330,18 @@
   gap: 0.42rem;
 }
 
+.study-toggle-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  color: var(--text-next);
+  font-size: 0.88rem;
+}
+
+.study-toggle-row input {
+  accent-color: var(--accent);
+}
+
 .audio-upload {
   border: 1px dashed var(--border-soft);
   border-radius: 0.85rem;
@@ -506,6 +522,10 @@
   font-size: 0.72rem;
 }
 
+.live-mode-pill {
+  pointer-events: none;
+}
+
 .teleprompter-stage {
   position: absolute;
   inset: 0;
@@ -601,6 +621,24 @@
   transition: width 120ms linear;
 }
 
+.cue-line.is-time-active:not(.is-active) {
+  color: color-mix(in srgb, var(--text-main) 88%, transparent);
+  opacity: 0.9;
+  transform: scale(1);
+}
+
+.cue-line.is-time-active:not(.is-active)::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: calc(100% + 0.1em);
+  width: calc(var(--cue-progress, 0) * 100%);
+  height: 2px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-muted) 72%, transparent);
+  transition: width 120ms linear;
+}
+
 .cue-line.is-past .cue-translation {
   color: color-mix(in srgb, var(--text-muted) 72%, transparent);
 }
@@ -609,8 +647,12 @@
   color: color-mix(in srgb, var(--text-main) 86%, transparent);
 }
 
-.focus-enabled .cue-line:not(.is-active) {
+.focus-enabled .cue-line:not(.is-active):not(.is-time-active) {
   filter: blur(1px);
+}
+
+.mode-live.mode-blind .cue-list {
+  filter: blur(5px);
 }
 
 .follow-button {

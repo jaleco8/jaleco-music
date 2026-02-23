@@ -18,6 +18,8 @@ type LineSpacing = 'compact' | 'normal' | 'relaxed'
 type PrepEditorTab = 'text' | 'timing'
 type SyncMode = 'auto' | 'manual'
 type GestureMode = 'idle' | 'pending' | 'horizontal' | 'vertical'
+type StudyMode = 'with-translation' | 'without-translation' | 'interactive'
+type CueKind = 'statement' | 'question'
 type Cue = {
   id: string
   text: string
@@ -33,6 +35,8 @@ type PrepPersistedState = {
   pairImportMode?: boolean
   syncMode?: SyncMode
   manualStarts?: number[]
+  studyMode?: StudyMode
+  blindMode?: boolean
 }
 
 type TapSide = 'left' | 'center' | 'right'
@@ -79,6 +83,15 @@ const splitLines = (text: string): string[] =>
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
+
+const classifyCueText = (text: string): CueKind => {
+  const trimmed = text.trim()
+  if (!trimmed) {
+    return 'statement'
+  }
+
+  return /\[YES\/NO\]/i.test(trimmed) || trimmed.endsWith('?') ? 'question' : 'statement'
+}
 
 const buildCueDrafts = (text: string, parseByPairs: boolean): CueDraft[] => {
   const lines = splitLines(text)
@@ -307,7 +320,8 @@ function App() {
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus>('stopped')
   const [lyrics, setLyrics] = useState(SAMPLE_TEXT)
   const [pairImportMode, setPairImportMode] = useState(false)
-  const [showTranslation, setShowTranslation] = useState(false)
+  const [studyMode, setStudyMode] = useState<StudyMode>('without-translation')
+  const [blindMode, setBlindMode] = useState(false)
   const [repeatTarget, setRepeatTarget] = useState<RepeatTarget>(20)
   const [playbackRate, setPlaybackRate] = useState<(typeof SPEED_OPTIONS)[number]>(1)
   const [volume, setVolume] = useState(0.85)
@@ -336,6 +350,20 @@ function App() {
   const [timeInputDrafts, setTimeInputDrafts] = useState<Record<number, string>>({})
   const [isPrepAudioPlaying, setIsPrepAudioPlaying] = useState(false)
   const [prepStateHydrated, setPrepStateHydrated] = useState(false)
+
+  const showTranslation = studyMode === 'with-translation'
+  const studyModeLabel =
+    studyMode === 'with-translation'
+      ? 'Con traducción'
+      : studyMode === 'without-translation'
+        ? 'Sin traducción'
+        : 'Interactivo'
+  const studyModeHint =
+    studyMode === 'with-translation'
+      ? 'Lee EN y ES un par de veces.'
+      : studyMode === 'without-translation'
+        ? 'Solo EN. Enfócate en entender sin ayuda.'
+        : 'Responde YES/NO después de cada pregunta.'
 
   const stageRef = useRef<HTMLDivElement | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -439,10 +467,19 @@ function App() {
       }
       if (typeof persisted.pairImportMode === 'boolean') {
         setPairImportMode(persisted.pairImportMode)
-        setShowTranslation(persisted.pairImportMode)
       }
       if (persisted.syncMode === 'auto' || persisted.syncMode === 'manual') {
         setSyncMode(persisted.syncMode)
+      }
+      if (
+        persisted.studyMode === 'with-translation' ||
+        persisted.studyMode === 'without-translation' ||
+        persisted.studyMode === 'interactive'
+      ) {
+        setStudyMode(persisted.studyMode)
+      }
+      if (typeof persisted.blindMode === 'boolean') {
+        setBlindMode(persisted.blindMode)
       }
       if (Array.isArray(persisted.manualStarts)) {
         const starts = persisted.manualStarts
@@ -467,6 +504,8 @@ function App() {
       pairImportMode,
       syncMode,
       manualStarts: normalizedManualStarts,
+      studyMode,
+      blindMode,
     }
 
     try {
@@ -474,7 +513,7 @@ function App() {
     } catch {
       // Ignore persistence errors (private mode / storage limits).
     }
-  }, [lyrics, normalizedManualStarts, pairImportMode, prepStateHydrated, syncMode])
+  }, [blindMode, lyrics, normalizedManualStarts, pairImportMode, prepStateHydrated, studyMode, syncMode])
 
   useEffect(() => {
     setTimingCursor((current) => clamp(current, 0, Math.max(cueDrafts.length - 1, 0)))
@@ -505,6 +544,31 @@ function App() {
 
     return cues.length - 1
   }, [cues, playheadSec])
+
+  const cueKinds = useMemo(() => cues.map((cue) => classifyCueText(cue.text)), [cues])
+
+  const focusCueIndex = useMemo(() => {
+    if (cues.length === 0) {
+      return 0
+    }
+
+    if (studyMode !== 'interactive') {
+      return activeCueIndex
+    }
+
+    if (cueKinds[activeCueIndex] === 'question') {
+      return activeCueIndex
+    }
+
+    const nextQuestionIndex = cueKinds.findIndex(
+      (kind, index) => index > activeCueIndex && kind === 'question',
+    )
+    if (nextQuestionIndex >= 0) {
+      return nextQuestionIndex
+    }
+
+    return activeCueIndex
+  }, [activeCueIndex, cueKinds, cues.length, studyMode])
 
   const currentCueProgress = useMemo(() => {
     const cue = cues[activeCueIndex]
@@ -923,10 +987,10 @@ function App() {
     viewMode,
   ])
 
-  const snapToActiveCue = useCallback(
+  const snapToFocusCue = useCallback(
     (behavior: ScrollBehavior) => {
       const stage = stageRef.current
-      const lineNode = cueRefs.current[activeCueIndex]
+      const lineNode = cueRefs.current[focusCueIndex]
 
       if (!stage || !lineNode) {
         return
@@ -945,13 +1009,13 @@ function App() {
         autoScrollFlagRef.current = false
       }, 320)
     },
-    [activeCueIndex],
+    [focusCueIndex],
   )
 
   const returnToFollow = useCallback(() => {
     setPlaybackStatus('playing')
-    snapToActiveCue('smooth')
-  }, [snapToActiveCue])
+    snapToFocusCue('smooth')
+  }, [snapToFocusCue])
 
   const enforceTranslationRepeatFloor = useCallback(() => {
     setRepeatTarget((current) => {
@@ -963,25 +1027,6 @@ function App() {
       return current
     })
   }, [showLoopToast])
-
-  const setTranslationVisibility = useCallback(
-    (next: boolean, options?: { recenterLive: boolean }) => {
-      setShowTranslation(next)
-
-      if (next) {
-        enforceTranslationRepeatFloor()
-      }
-
-      if (options?.recenterLive && viewMode === 'live') {
-        window.requestAnimationFrame(() => {
-          window.requestAnimationFrame(() => {
-            snapToActiveCue('smooth')
-          })
-        })
-      }
-    },
-    [enforceTranslationRepeatFloor, snapToActiveCue, viewMode],
-  )
 
   const applyRepeatTarget = useCallback(
     (nextTarget: RepeatTarget) => {
@@ -996,18 +1041,15 @@ function App() {
     [showLoopToast, showTranslation],
   )
 
-  const handleTranslationToggle = useCallback(() => {
-    setTranslationVisibility(!showTranslation, { recenterLive: true })
-  }, [setTranslationVisibility, showTranslation])
-
-  const applyStudyMode = (mode: 'translated' | 'blind') => {
-    if (mode === 'translated') {
-      setTranslationVisibility(true)
-      return
-    }
-
-    setTranslationVisibility(false)
-  }
+  const applyStudyMode = useCallback(
+    (mode: StudyMode) => {
+      setStudyMode(mode)
+      if (mode === 'with-translation') {
+        enforceTranslationRepeatFloor()
+      }
+    },
+    [enforceTranslationRepeatFloor],
+  )
 
   const handlePairImportModeChange = (next: boolean) => {
     if (pairImportMode === next) {
@@ -1024,7 +1066,6 @@ function App() {
     }
 
     setPairImportMode(next)
-    setTranslationVisibility(next, { recenterLive: false })
     resetSession()
   }
 
@@ -1260,8 +1301,8 @@ function App() {
       return
     }
 
-    snapToActiveCue('smooth')
-  }, [activeCueIndex, playbackStatus, snapToActiveCue, viewMode])
+    snapToFocusCue('smooth')
+  }, [focusCueIndex, playbackStatus, snapToFocusCue, viewMode])
 
   useEffect(() => {
     if (viewMode !== 'live') {
@@ -1269,13 +1310,13 @@ function App() {
     }
 
     const timer = window.setTimeout(() => {
-      snapToActiveCue('auto')
+      snapToFocusCue('auto')
     }, 50)
 
     return () => {
       window.clearTimeout(timer)
     }
-  }, [snapToActiveCue, viewMode])
+  }, [snapToFocusCue, viewMode])
 
   useEffect(() => {
     if (lastActiveCueRef.current === activeCueIndex) {
@@ -1484,6 +1525,8 @@ function App() {
     viewMode === 'live' ? 'mode-live' : 'mode-prep',
     controlsVisible ? 'controls-visible' : 'controls-hidden',
     focusMode ? 'focus-enabled' : 'focus-disabled',
+    blindMode ? 'mode-blind' : 'mode-clear',
+    studyMode === 'interactive' ? 'study-interactive' : 'study-standard',
   ].join(' ')
 
   return (
@@ -1742,21 +1785,47 @@ function App() {
               <div className="chip-row" role="radiogroup" aria-label="Modo de estudio">
                 <button
                   type="button"
-                  className={showTranslation ? 'chip is-active' : 'chip'}
-                  onClick={() => applyStudyMode('translated')}
+                  role="radio"
+                  aria-checked={studyMode === 'with-translation'}
+                  className={studyMode === 'with-translation' ? 'chip is-active' : 'chip'}
+                  onClick={() => applyStudyMode('with-translation')}
                   data-interactive="true"
                 >
-                  Escucha con traducción
+                  Con traducción
                 </button>
                 <button
                   type="button"
-                  className={showTranslation ? 'chip' : 'chip is-active'}
-                  onClick={() => applyStudyMode('blind')}
+                  role="radio"
+                  aria-checked={studyMode === 'without-translation'}
+                  className={studyMode === 'without-translation' ? 'chip is-active' : 'chip'}
+                  onClick={() => applyStudyMode('without-translation')}
                   data-interactive="true"
                 >
-                  Escucha a ciegas
+                  Sin traducción
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={studyMode === 'interactive'}
+                  className={studyMode === 'interactive' ? 'chip is-active' : 'chip'}
+                  onClick={() => applyStudyMode('interactive')}
+                  data-interactive="true"
+                >
+                  Interactivo
                 </button>
               </div>
+              <p className="field-hint study-mode-hint">{studyModeHint}</p>
+
+              <label className="study-toggle-row">
+                <input
+                  type="checkbox"
+                  checked={blindMode}
+                  onChange={(event) => setBlindMode(event.target.checked)}
+                  data-interactive="true"
+                />
+                A ciegas
+              </label>
+              {blindMode && <p className="field-hint study-mode-hint">Texto difuminado. Entrena oído.</p>}
 
               <div className="chip-row" role="radiogroup" aria-label="Velocidad">
                 {SPEED_OPTIONS.map((option) => (
@@ -1939,14 +2008,10 @@ function App() {
                 {remainingLoops !== null && <small>Restan: {remainingLoops}</small>}
               </div>
 
-              <button
-                type="button"
-                className={showTranslation ? 'chip is-active' : 'chip'}
-                onClick={handleTranslationToggle}
-                data-interactive="true"
-              >
-                ES: {showTranslation ? 'ON' : 'OFF'}
-              </button>
+              <span className="chip live-mode-pill" data-interactive="true">
+                {studyModeLabel}
+                {blindMode ? ' · A ciegas' : ''}
+              </span>
 
               <button className="ghost-button small" onClick={toggleFullscreen} type="button" data-interactive="true">
                 {isFullscreen ? 'Salir' : 'Full'}
@@ -1957,11 +2022,18 @@ function App() {
           <div className="teleprompter-stage" ref={stageRef} onScroll={handleStageScroll}>
             <div className="cue-list" style={{ '--cue-font-size': `${FONT_LEVELS[fontLevel]}px` } as CSSProperties}>
               {cues.map((cue, index) => {
-                const isActive = index === activeCueIndex
+                const cueKind = cueKinds[index] ?? 'statement'
+                const isQuestion = cueKind === 'question'
+                const isTimeActive = index === activeCueIndex
+                const isFocusTarget = index === focusCueIndex
+                const isHighlighted =
+                  studyMode === 'interactive' ? isFocusTarget && isQuestion : isFocusTarget
                 const isPast = index < activeCueIndex
                 const className = [
                   'cue-line',
-                  isActive ? 'is-active' : '',
+                  isHighlighted ? 'is-active' : '',
+                  isTimeActive ? 'is-time-active' : '',
+                  studyMode === 'interactive' ? (isQuestion ? 'is-question' : 'is-statement') : '',
                   isPast ? 'is-past' : 'is-next',
                 ]
                   .filter(Boolean)
@@ -1975,7 +2047,7 @@ function App() {
                     }}
                     className={className}
                     style={
-                      isActive
+                      isTimeActive
                         ? ({ '--cue-progress': `${currentCueProgress}` } as CSSProperties)
                         : undefined
                     }
