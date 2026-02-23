@@ -26,7 +26,8 @@ Jaleco Music te da una experiencia tipo “karaoke” para **repetir**, **ajusta
 
 ### Preparación
 - Edición de texto/letras antes de iniciar.
-- Modos de práctica: **con traducción** y **a ciegas** (traducción apagada por defecto en Live).
+- Modos de estudio: **Con traducción**, **Sin traducción** e **Interactivo**.
+- Toggle independiente **A ciegas** para difuminar texto en Live.
 - Velocidad: `0.5x · 0.75x · Normal · 1.25x · 1.5x`
 - Repetición rápida: `x5 · x10 · x20 · x30 · x40 · ∞`
 - Legibilidad: tamaños A1–A4, interlineado, modo oscuro y modo enfoque.
@@ -35,6 +36,7 @@ Jaleco Music te da una experiencia tipo “karaoke” para **repetir**, **ajusta
 ### Live
 - Auto-scroll con foco visual (teleprompter real, sin distracciones).
 - Highlight animado por línea + progreso por “cue”.
+- En modo **Interactivo** el foco visual prioriza preguntas (`[YES/NO]` o `?`).
 - Controles ocultables y auto-hide durante reproducción.
 - Gestos:
   - Doble tap izquierda: `-10s`
