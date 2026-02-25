@@ -127,15 +127,34 @@
   font-weight: 700;
 }
 
+.panel-title-with-icon,
+.label-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+}
+
+.ui-icon {
+  width: 0.92rem;
+  height: 0.92rem;
+  flex: 0 0 auto;
+}
+
+.label-icon {
+  color: currentColor;
+}
+
 .field textarea {
   width: 100%;
   min-height: 220px;
+  height: 260px;
   border-radius: 0.85rem;
   border: 1px solid var(--border-soft);
   background: color-mix(in srgb, var(--surface-strong) 86%, transparent);
   color: var(--text-main);
   padding: 0.8rem;
-  resize: vertical;
+  resize: none;
+  overflow-y: auto;
   font-size: 1rem;
   line-height: 1.45;
   font-family: inherit;
@@ -143,6 +162,7 @@
 
 .prep-editor textarea {
   min-height: 240px;
+  height: clamp(240px, 36vh, 340px);
 }
 
 .field-hint {
@@ -356,6 +376,17 @@
   position: relative;
 }
 
+.theme-light .chip:not(.is-active) {
+  border-color: rgba(31, 39, 51, 0.34);
+  background: rgba(255, 255, 255, 0.94);
+  color: #1e2b39;
+}
+
+.theme-light .chip:not(.is-active):hover {
+  border-color: rgba(31, 39, 51, 0.48);
+  background: #fff;
+}
+
 .chip.is-active {
   border-color: color-mix(in srgb, var(--accent) 82%, black 10%);
   background: var(--accent);
@@ -527,6 +558,12 @@
   box-shadow: 0 10px 22px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
+.prep-start-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 :where(button, input, textarea):focus-visible {
   outline: 3px solid color-mix(in srgb, var(--accent) 74%, white 20%);
   outline-offset: 2px;
@@ -543,6 +580,20 @@
 .ghost-button.small {
   padding: 0.34rem 0.62rem;
   font-size: 0.78rem;
+}
+
+.accordion-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.icon-chevron {
+  transition: transform 180ms ease;
+}
+
+.icon-chevron.is-open {
+  transform: rotate(180deg);
 }
 
 .ghost-button.tiny {

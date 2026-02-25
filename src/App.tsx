@@ -117,6 +117,7 @@ const DOUBLE_TAP_MS = 280
 const HIDE_CONTROLS_MS = 2600
 const MIN_CUE_GAP_SEC = 0.05
 const SHIFT_STEP_SEC = 0.2
+const KEYBOARD_VOLUME_STEP = 0.05
 const PREP_STORAGE_KEY = 'jaleco-music:prep-sync:v1'
 const PREP_UI_SESSION_KEY = 'jaleco-music:prep-ui-session:v1'
 const ANALYTICS_USER_KEY = 'jaleco-music:analytics-user:v1'
@@ -442,6 +443,18 @@ const buildManualCues = (drafts: CueDraft[], starts: number[], totalDuration: nu
 const isInteractiveTarget = (target: EventTarget | null): boolean =>
   target instanceof HTMLElement && Boolean(target.closest('[data-interactive="true"]'))
 
+const isTextEntryTarget = (target: EventTarget | null): boolean => {
+  if (!(target instanceof HTMLElement)) {
+    return false
+  }
+
+  if (target.isContentEditable || Boolean(target.closest('[contenteditable="true"]'))) {
+    return true
+  }
+
+  return ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
+}
+
 const readStorage = (storage: Storage, key: string): string | null => {
   try {
     return storage.getItem(key)
@@ -561,6 +574,77 @@ type ChipSelectableProps = {
   className?: string
   type?: 'button' | 'submit' | 'reset'
   dataInteractive?: boolean
+}
+
+type IconName = 'chevron' | 'play' | 'speaker' | 'settings'
+
+const UiIcon = ({ name, className }: { name: IconName; className?: string }) => {
+  const classes = ['ui-icon', className].filter(Boolean).join(' ')
+
+  if (name === 'chevron') {
+    return (
+      <svg
+        className={classes}
+        viewBox="0 0 16 16"
+        aria-hidden="true"
+        focusable="false"
+        fill="none"
+      >
+        <path d="M3.5 6.25 8 10.5l4.5-4.25" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    )
+  }
+
+  if (name === 'play') {
+    return (
+      <svg
+        className={classes}
+        viewBox="0 0 16 16"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M5 3.5v9l7-4.5-7-4.5Z" fill="currentColor" />
+      </svg>
+    )
+  }
+
+  if (name === 'speaker') {
+    return (
+      <svg
+        className={classes}
+        viewBox="0 0 16 16"
+        aria-hidden="true"
+        focusable="false"
+        fill="none"
+      >
+        <path
+          d="M2.3 9.8h2.2L8 12.6V3.4L4.5 6.2H2.3zM10.2 6.1a2.6 2.6 0 0 1 0 3.8M11.9 4.5a4.8 4.8 0 0 1 0 7"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    )
+  }
+
+  return (
+    <svg
+      className={classes}
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+      focusable="false"
+      fill="none"
+    >
+      <path
+        d="m8 2.1 1 .2.5 1.4 1.4.4 1.2-.8.8.8-.8 1.2.4 1.4 1.4.5.2 1-.2 1-1.4.5-.4 1.4.8 1.2-.8.8-1.2-.8-1.4.4-.5 1.4-1 .2-1-.2-.5-1.4-1.4-.4-1.2.8-.8-.8.8-1.2-.4-1.4-1.4-.5-.2-1 .2-1 1.4-.5.4-1.4-.8-1.2.8-.8 1.2.8 1.4-.4.5-1.4z"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      <circle cx="8" cy="8" r="2.2" stroke="currentColor" strokeWidth="1.2" />
+    </svg>
+  )
 }
 
 const ChipSelectable = ({
@@ -747,6 +831,7 @@ function App() {
   const repeatTargetRef = useRef<RepeatTarget>(repeatTarget)
   const totalDurationRef = useRef(totalDuration)
   const completedLoopsRef = useRef(completedLoops)
+  const volumeRef = useRef(volume)
 
   useEffect(() => {
     repeatTargetRef.current = repeatTarget
@@ -759,6 +844,10 @@ function App() {
   useEffect(() => {
     completedLoopsRef.current = completedLoops
   }, [completedLoops])
+
+  useEffect(() => {
+    volumeRef.current = volume
+  }, [volume])
 
   useEffect(() => {
     try {
@@ -1207,6 +1296,36 @@ function App() {
     [playheadSec, seekTo, setGestureFeedback],
   )
 
+  const seekToAdjacentCue = useCallback(
+    (direction: -1 | 1) => {
+      if (cues.length === 0) {
+        return
+      }
+
+      const nextIndex = clamp(activeCueIndex + direction, 0, cues.length - 1)
+      const nextCue = cues[nextIndex]
+      if (!nextCue) {
+        return
+      }
+
+      seekTo(nextCue.start)
+      setControlsVisible(true)
+      setGestureFeedback(`Frase ${nextIndex + 1}/${cues.length}`)
+    },
+    [activeCueIndex, cues, seekTo, setGestureFeedback],
+  )
+
+  const adjustVolumeBy = useCallback(
+    (delta: number) => {
+      const nextVolume = clamp(Number((volumeRef.current + delta).toFixed(2)), 0, 1)
+      volumeRef.current = nextVolume
+      setVolume(nextVolume)
+      setControlsVisible(true)
+      setGestureFeedback(`Volumen ${Math.round(nextVolume * 100)}%`)
+    },
+    [setGestureFeedback],
+  )
+
   const readEditorTimeSec = useCallback(() => {
     const audio = audioRef.current
     if (audio && audioUrl) {
@@ -1548,6 +1667,12 @@ function App() {
       return
     }
 
+    if (playbackStatus === 'countdown') {
+      setPlaybackStatus('paused')
+      setCountdownValue(0)
+      return
+    }
+
     if (viewMode === 'prep') {
       const audio = audioRef.current
       if (audio) {
@@ -1775,7 +1900,7 @@ function App() {
     resetSession()
   }
 
-  const toggleFullscreen = async () => {
+  const toggleFullscreen = useCallback(async () => {
     if (!document.fullscreenElement) {
       if (document.documentElement.requestFullscreen) {
         await document.documentElement.requestFullscreen()
@@ -1783,7 +1908,7 @@ function App() {
     } else if (document.exitFullscreen) {
       await document.exitFullscreen()
     }
-  }
+  }, [])
 
   useEffect(() => {
     cueRefs.current = cueRefs.current.slice(0, cues.length)
@@ -2016,6 +2141,68 @@ function App() {
       }
     }
   }, [controlsVisible, isActivePlayback, viewMode])
+
+  useEffect(() => {
+    if (viewMode !== 'live') {
+      return
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) {
+        return
+      }
+
+      if (isTextEntryTarget(event.target) || isInteractiveTarget(event.target)) {
+        return
+      }
+
+      if (event.code === 'Space') {
+        event.preventDefault()
+
+        if (event.repeat) {
+          return
+        }
+
+        togglePlayback()
+        setControlsVisible(true)
+        return
+      }
+
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault()
+        seekToAdjacentCue(-1)
+        return
+      }
+
+      if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        seekToAdjacentCue(1)
+        return
+      }
+
+      if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        adjustVolumeBy(KEYBOARD_VOLUME_STEP)
+        return
+      }
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        adjustVolumeBy(-KEYBOARD_VOLUME_STEP)
+        return
+      }
+
+      if (event.key.toLowerCase() === 'f') {
+        event.preventDefault()
+        void toggleFullscreen()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [adjustVolumeBy, seekToAdjacentCue, toggleFullscreen, togglePlayback, viewMode])
 
   useEffect(() => {
     return () => {
@@ -2568,7 +2755,10 @@ function App() {
               </div>
 
               <label className="slider-field">
-                <span>Volumen {Math.round(volume * 100)}%</span>
+                <span className="label-with-icon">
+                  <UiIcon name="speaker" className="label-icon" />
+                  Volumen {Math.round(volume * 100)}%
+                </span>
                 <input
                   type="range"
                   min={0}
@@ -2583,16 +2773,20 @@ function App() {
 
             <div className="panel-card panel-collapsible">
               <div className="panel-headline">
-                <p className="panel-title">Audio (opcional)</p>
+                <p className="panel-title panel-title-with-icon">
+                  <UiIcon name="speaker" className="label-icon" />
+                  Audio (opcional)
+                </p>
                 <button
                   type="button"
-                  className="ghost-button small"
+                  className="ghost-button small accordion-trigger"
                   aria-expanded={isAudioExpanded}
                   aria-controls="prep-audio-content"
                   onClick={toggleAudioPanel}
                   data-interactive="true"
                 >
-                  {isAudioExpanded ? 'Ocultar' : 'Mostrar'}
+                  <span>{isAudioExpanded ? 'Ocultar' : 'Mostrar'}</span>
+                  <UiIcon name="chevron" className={isAudioExpanded ? 'icon-chevron is-open' : 'icon-chevron'} />
                 </button>
               </div>
 
@@ -2625,16 +2819,20 @@ function App() {
 
             <div className="panel-card panel-collapsible">
               <div className="panel-headline">
-                <p className="panel-title">Ajustes avanzados</p>
+                <p className="panel-title panel-title-with-icon">
+                  <UiIcon name="settings" className="label-icon" />
+                  Ajustes avanzados
+                </p>
                 <button
                   type="button"
-                  className="ghost-button small"
+                  className="ghost-button small accordion-trigger"
                   aria-expanded={isAdvancedOpen}
                   aria-controls="prep-advanced-content"
                   onClick={() => setIsAdvancedOpen((open) => !open)}
                   data-interactive="true"
                 >
-                  {isAdvancedOpen ? 'Ocultar' : 'Mostrar'}
+                  <span>{isAdvancedOpen ? 'Ocultar' : 'Mostrar'}</span>
+                  <UiIcon name="chevron" className={isAdvancedOpen ? 'icon-chevron is-open' : 'icon-chevron'} />
                 </button>
               </div>
 
@@ -2723,7 +2921,8 @@ function App() {
               {cues.length} frases · {formatTime(totalDuration)} por vuelta ·{' '}
               {repeatTarget === 'inf' ? '∞ repeticiones' : `${repeatTarget} repeticiones`}
             </p>
-            <button className="primary-button" onClick={handlePrepStart} type="button" data-interactive="true">
+            <button className="primary-button prep-start-button" onClick={handlePrepStart} type="button" data-interactive="true">
+              <UiIcon name="play" className="label-icon" />
               Comenzar práctica
             </button>
           </footer>
