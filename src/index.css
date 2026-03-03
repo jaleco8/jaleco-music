@@ -1,5 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
 
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --motion-fast: 160ms;
+  --motion-base: 220ms;
+  --touch-min: 44px;
+  --state-info: #8dc7ff;
+  --state-success: #8dffcb;
+  --state-warning: #ffd67f;
+  --state-error: #ff9d9d;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -26,4 +46,15 @@ textarea {
 
 button {
   color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
