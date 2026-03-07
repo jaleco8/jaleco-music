@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom'
 import { useContentStore } from '@/stores/useContentStore'
 import { useProgressStore } from '@/stores/useProgressStore'
 import { CourseCard } from '@/components/CourseCard'
-import { ContentLoader } from '@/components/ContentLoader'
 import { Button } from '@/components/ui/Button'
 import { UiIcon } from '@/components/ui/Icons'
 
@@ -49,54 +48,22 @@ export default function HomePage() {
           </Button>
         </header>
 
-        {/* Empty state */}
-        {courses.length === 0 && (
-          <div className="
-            flex flex-col items-center justify-center gap-6 py-20
-            text-center
-          ">
-            <div className="
-              w-20 h-20 rounded-full
-              bg-[var(--accent-soft)] flex items-center justify-center
-            ">
-              <UiIcon name="folder" size={36} className="text-[var(--accent)]" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-[var(--text-main)] mb-2">
-                Empieza cargando un curso
-              </h2>
-              <p className="text-sm text-[var(--text-muted)] max-w-xs mx-auto">
-                Selecciona una carpeta con tus lecciones organizadas para comenzar a practicar.
-              </p>
-            </div>
-            <ContentLoader />
-          </div>
-        )}
-
         {/* Course grid */}
-        {courses.length > 0 && (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-              {courses.map((course) => {
-                const stats = getCourseStats(course.id)
-                return (
-                  <CourseCard
-                    key={course.id}
-                    course={course}
-                    progress={stats.progress}
-                    lessonsCompleted={stats.lessonsCompleted}
-                    totalLessons={stats.totalLessons}
-                    onClick={() => navigate(`/course/${course.id}`)}
-                  />
-                )
-              })}
-            </div>
-
-            <div className="flex justify-center">
-              <ContentLoader />
-            </div>
-          </>
-        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          {courses.map((course) => {
+            const stats = getCourseStats(course.id)
+            return (
+              <CourseCard
+                key={course.id}
+                course={course}
+                progress={stats.progress}
+                lessonsCompleted={stats.lessonsCompleted}
+                totalLessons={stats.totalLessons}
+                onClick={() => navigate(`/course/${course.id}`)}
+              />
+            )
+          })}
+        </div>
       </div>
     </div>
   )

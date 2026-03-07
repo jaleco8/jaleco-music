@@ -43,7 +43,7 @@ export function CueDisplay({
         const isFocus = index === focusCueIndex
         const isPast = index < activeCueIndex
         const isNext = index > activeCueIndex
-        const isQuestion = cue.kind === 'question'
+        const isQuestion = cue.kind === 'question' && studyMode === 'interactive'
 
         let opacity = 1
         let scale = 1
