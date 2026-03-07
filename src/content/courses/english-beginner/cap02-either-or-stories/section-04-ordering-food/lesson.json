@@ -1,0 +1,13 @@
+{
+  "id": "section-04-ordering-food",
+  "title": "Ordering Food",
+  "chapterId": "cap02-either-or-stories",
+  "order": 4,
+  "estimatedMinutes": 8,
+  "tags": [],
+  "audioNormal": "audio-normal.mp3",
+  "audioInteractive": "audio-interactive.mp3",
+  "textFile": "text.txt",
+  "defaultRepeatTarget": 20,
+  "defaultSpeed": 1
+}

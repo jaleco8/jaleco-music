@@ -1,0 +1,13 @@
+{
+  "id": "section-14-holidays",
+  "title": "Holidays",
+  "chapterId": "cap01-interactive-stories",
+  "order": 14,
+  "estimatedMinutes": 8,
+  "tags": [],
+  "audioNormal": "audio-normal.mp3",
+  "audioInteractive": "audio-interactive.mp3",
+  "textFile": "text.txt",
+  "defaultRepeatTarget": 20,
+  "defaultSpeed": 1
+}

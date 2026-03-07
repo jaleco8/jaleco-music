@@ -1,0 +1,13 @@
+{
+  "id": "section-21-weather",
+  "title": "Weather",
+  "chapterId": "cap01-interactive-stories",
+  "order": 21,
+  "estimatedMinutes": 8,
+  "tags": [],
+  "audioNormal": "audio-normal.mp3",
+  "audioInteractive": "audio-interactive.mp3",
+  "textFile": "text.txt",
+  "defaultRepeatTarget": 20,
+  "defaultSpeed": 1
+}

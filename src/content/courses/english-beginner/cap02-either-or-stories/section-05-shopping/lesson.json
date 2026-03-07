@@ -1,0 +1,13 @@
+{
+  "id": "section-05-shopping",
+  "title": "Shopping",
+  "chapterId": "cap02-either-or-stories",
+  "order": 5,
+  "estimatedMinutes": 8,
+  "tags": [],
+  "audioNormal": "audio-normal.mp3",
+  "audioInteractive": "audio-interactive.mp3",
+  "textFile": "text.txt",
+  "defaultRepeatTarget": 20,
+  "defaultSpeed": 1
+}

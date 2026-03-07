@@ -1,0 +1,13 @@
+{
+  "id": "section-03-traveling",
+  "title": "Traveling",
+  "chapterId": "cap01-interactive-stories",
+  "order": 3,
+  "estimatedMinutes": 8,
+  "tags": [],
+  "audioNormal": "audio-normal.mp3",
+  "audioInteractive": "audio-interactive.mp3",
+  "textFile": "text.txt",
+  "defaultRepeatTarget": 20,
+  "defaultSpeed": 1
+}

@@ -1,0 +1,13 @@
+{
+  "id": "section-32-motivation",
+  "title": "Motivation",
+  "chapterId": "cap01-interactive-stories",
+  "order": 32,
+  "estimatedMinutes": 8,
+  "tags": [],
+  "audioNormal": "audio-normal.mp3",
+  "audioInteractive": "audio-interactive.mp3",
+  "textFile": "text.txt",
+  "defaultRepeatTarget": 20,
+  "defaultSpeed": 1
+}

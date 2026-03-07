@@ -1,0 +1,19 @@
+{
+  "id": "english-beginner",
+  "title": "Inglés — Nivel Básico",
+  "description": "Historias interactivas para construir tu base en inglés.",
+  "language": { "target": "en", "native": "es" },
+  "coverColor": "#4F46E5",
+  "chapters": [
+    {
+      "id": "cap01-interactive-stories",
+      "title": "CAPÍTULO 1: HISTORIAS INTERACTIVAS [YES/NO]",
+      "totalSections": 34
+    },
+    {
+      "id": "cap02-either-or-stories",
+      "title": "CAPÍTULO 2: HISTORIAS INTERACTIVAS [EITHER/OR]",
+      "totalSections": 34
+    }
+  ]
+}
