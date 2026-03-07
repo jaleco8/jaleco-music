@@ -1,0 +1,13 @@
+{
+  "id": "section-26-fears",
+  "title": "Fears",
+  "chapterId": "cap02-either-or-stories",
+  "order": 26,
+  "estimatedMinutes": 8,
+  "tags": [],
+  "audioNormal": "audio-normal.mp3",
+  "audioInteractive": "audio-interactive.mp3",
+  "textFile": "text.txt",
+  "defaultRepeatTarget": 20,
+  "defaultSpeed": 1
+}

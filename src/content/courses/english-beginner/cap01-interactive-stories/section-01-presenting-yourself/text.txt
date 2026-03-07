@@ -1,0 +1,79 @@
+Hello, my name is David.
+Hola mi nombre es David.
+Is my name David? [YES/NO], it is.
+
+I am thirty-two years old. 
+Tengo treinta y dos años de edad.
+Am I thirty-two years old? [YES/NO], I am.
+
+I live in Colombia.
+Vivo en Colombia.
+Do I live in the United States? [YES/NO], I don’t.
+
+I am from the United States.
+Soy de Estados Unidos.
+Am I from the United States? [YES/NO], I am.
+
+I am married.
+Estoy casado.
+Am I single? [YES/NO], I’m not.
+
+My wife and I have three children.
+Mi esposa y yo tenemos tres hijos.
+Do I have three children? [YES/NO], I do.
+
+I have two sons and one daughter.
+Tengo dos hijos y una hija.
+Do I have three sons? [YES/NO], I don’t.
+
+Their names are John, Kevin, and Ann.
+Sus nombres son John, Kevin y Ann.
+Is my daughter’s name Ann? [YES/NO], it is.
+
+We also have a dog.
+También tenemos un perro.
+Do I have a cat? [YES/NO], I don’t.
+
+The dog’s name is Buster.
+El nombre del perro es Buster.
+Is my dog’s name Fido? [YES/NO], it isn’t.
+
+I work as a postman.
+Soy cartero.
+Do I have a job? [YES/NO], I do.
+
+I deliver the mail each day.
+Entrego el correo todos los días.
+Do I deliver the mail? [YES/NO], I do.
+
+I like to eat American food.
+Me gusta comer comida americana.
+Do I like to eat Italian food? [YES/NO], I don’t.
+
+Hot dogs are delicious.
+Los perros calientes son deliciosos.
+Do I think hot dogs are delicious? [YES/NO], I do.
+
+I also like to cook.
+También me gusta cocinar.
+Is cooking something I like to do? [YES/NO], it is.
+
+Cakes are my favorite food to bake.
+Los pasteles son mi comida favorita para hornear.
+Can I bake a cake? [YES/NO], I can.
+
+Cakes are also my favorite food to eat.
+Los pasteles también son mi comida favorita para comer.
+Are donuts my favorite food to eat? [YES/NO], they aren’t.
+
+I also enjoy exercising.
+También disfruto hacer ejercicio.
+Do I enjoy exercising? [YES/NO], I do.
+
+I like to run and hike.
+Me gusta correr y hacer senderismo.
+Do I like to swim? [YES/NO], I don’t.
+
+After eating hot dogs and cakes, I need to exercise.
+Después de comer perros calientes y pasteles, necesito hacer ejercicio.
+After eating cake, do I need to sleep? [YES/NO], I don’t.

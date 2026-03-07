@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(done)",
+      "Bash(python3 -c \" import subprocess, os # Get all strings from all iwa files all_text = [] iwa_dir = ''/tmp/pages-extract/Index'' for root, dirs, files in os.walk\\(iwa_dir\\): for f in files: if f.endswith\\(''.iwa''\\): path = os.path.join\\(root, f\\) result = subprocess.run\\([''strings'', path], capture_output=True, text=True\\) lines = result.stdout.split\\(''\\\\n''\\) for line in lines: line = line.strip\\(\\) if len\\(line\\) > 5 and any\\(c.isalpha\\(\\) for c in line\\): # Filter obvious locale/format strings if not any\\(x in line for x in [''enero'', ''febrero'', ''marzo'', ''abril'', ''mayo'', ''junio'', ''julio'', ''agosto'', ''septiembre'', ''octubre'', ''noviembre'', ''diciembre'', ''lunes'', ''martes'', ''miercoles'', ''jueves'', ''viernes'', ''sabado'', ''domingo'']\\): all_text.append\\(line\\) # Deduplicate while preserving order seen = set\\(\\) unique = [] for line in all_text: if line not in seen: seen.add\\(line\\) unique.append\\(line\\) print\\(''\\\\n''.join\\(unique\\)\\) \")",
+      "Bash(bash scripts/create-content-structure.sh)",
+      "Bash(bash scripts/create-cap02-structure.sh)",
+      "Bash(npm run build)"
+    ]
+  }
+}

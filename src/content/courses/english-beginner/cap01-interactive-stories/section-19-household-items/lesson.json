@@ -1,0 +1,13 @@
+{
+  "id": "section-19-household-items",
+  "title": "Household Items",
+  "chapterId": "cap01-interactive-stories",
+  "order": 19,
+  "estimatedMinutes": 8,
+  "tags": [],
+  "audioNormal": "audio-normal.mp3",
+  "audioInteractive": "audio-interactive.mp3",
+  "textFile": "text.txt",
+  "defaultRepeatTarget": 20,
+  "defaultSpeed": 1
+}

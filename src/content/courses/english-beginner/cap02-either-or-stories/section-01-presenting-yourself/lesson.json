@@ -1,0 +1,13 @@
+{
+  "id": "section-01-presenting-yourself",
+  "title": "Presenting Yourself",
+  "chapterId": "cap02-either-or-stories",
+  "order": 1,
+  "estimatedMinutes": 8,
+  "tags": [],
+  "audioNormal": "audio-normal.mp3",
+  "audioInteractive": "audio-interactive.mp3",
+  "textFile": "text.txt",
+  "defaultRepeatTarget": 20,
+  "defaultSpeed": 1
+}
