@@ -56,6 +56,12 @@ export type LivePanel = 'speed' | 'repeat' | 'more' | null
 export type UiToastTone = 'info' | 'success' | 'warning' | 'error'
 
 /* ── Content (folder-based) ── */
+export interface Chapter {
+  id: string
+  title: string
+  totalSections: number
+}
+
 export interface Course {
   id: string
   title: string
@@ -63,6 +69,7 @@ export interface Course {
   language: { target: string; native: string }
   coverColor: string
   totalUnits: number
+  chapters?: Chapter[]
 }
 
 export interface Lesson {

@@ -7,13 +7,38 @@
   "chapters": [
     {
       "id": "cap01-interactive-stories",
-      "title": "CAPÍTULO 1: HISTORIAS INTERACTIVAS [YES/NO]",
+      "title": "Historias Interactivas [YES/NO]",
       "totalSections": 34
     },
     {
       "id": "cap02-either-or-stories",
-      "title": "CAPÍTULO 2: HISTORIAS INTERACTIVAS [EITHER/OR]",
+      "title": "Historias Interactivas [EITHER/OR]",
       "totalSections": 34
+    },
+    {
+      "id": "cap03-one-word-stories",
+      "title": "Historias Interactivas [1-WORD ANSWER]",
+      "totalSections": 34
+    },
+    {
+      "id": "cap04-full-sentence-stories",
+      "title": "Historias Interactivas [FULL SENTENCE]",
+      "totalSections": 34
+    },
+    {
+      "id": "cap05-ocean-method",
+      "title": "Swimming in the Ocean",
+      "totalSections": 35
+    },
+    {
+      "id": "cap06-pronunciation",
+      "title": "Swimming Without Floaties",
+      "totalSections": 22
+    },
+    {
+      "id": "extras-interactive-stories",
+      "title": "Más Historias Interactivas",
+      "totalSections": 25
     }
   ]
 }

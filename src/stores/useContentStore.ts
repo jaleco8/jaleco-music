@@ -1,11 +1,12 @@
 import { create } from 'zustand'
 import type { Course } from '@/types'
-import { getCourse, getLessonsByCourse } from '@/lib/contentLoader'
+import { getCourse, getLessonsByCourse, getLessonsByChapter } from '@/lib/contentLoader'
 import type { LessonData } from '@/lib/contentLoader'
 
 interface ContentState {
   courses: Course[]
   lessonsByCourse: Record<string, LessonData[]>
+  lessonsByChapter: Record<string, LessonData[]>
   activeCourseId: string | null
   activeLessonId: string | null
 
@@ -21,6 +22,7 @@ export const useContentStore = create<ContentState>()(
   (set, get) => ({
     courses: [getCourse()],
     lessonsByCourse: getLessonsByCourse(),
+    lessonsByChapter: getLessonsByChapter(),
     activeCourseId: null,
     activeLessonId: null,
 

@@ -24,7 +24,7 @@ export const parseTimecode = (raw: string): number | null => {
   const asSeconds = Number(trimmed.replace(',', '.'))
   if (Number.isFinite(asSeconds)) return asSeconds
 
-  const match = trimmed.match(/^(\d+):([0-5]\d(?:[.,]\d+)?)$/)
+  const match = /^(\d+):([0-5]\d(?:[.,]\d+)?)$/.exec(trimmed)
   if (!match) return null
 
   const minutes = Number(match[1])
@@ -84,4 +84,25 @@ export const downloadTextFile = (filename: string, content: string): void => {
   anchor.click()
   anchor.remove()
   URL.revokeObjectURL(url)
+}
+
+/**
+ * Extracts cue start times (in seconds) from a WEBVTT string.
+ * Returns the array of start times in order.
+ */
+export const parseVttStarts = (vttContent: string): number[] => {
+  const starts: number[] = []
+  // Match timestamp lines: HH:MM:SS.mmm --> HH:MM:SS.mmm
+  const lineRe = /^(\d{2}):(\d{2}):(\d{2})[.,](\d{3})\s*-->/m
+  for (const line of vttContent.split('\n')) {
+    const m = lineRe.exec(line)
+    if (m) {
+      const h = Number(m[1])
+      const min = Number(m[2])
+      const s = Number(m[3])
+      const ms = Number(m[4])
+      starts.push(h * 3600 + min * 60 + s + ms / 1000)
+    }
+  }
+  return starts
 }

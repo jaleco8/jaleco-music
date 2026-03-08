@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useSettingsStore } from '@/stores/useSettingsStore'
 import { useProgressStore } from '@/stores/useProgressStore'
+import { useContentStore } from '@/stores/useContentStore'
 import { Button } from '@/components/ui/Button'
 import { Chip } from '@/components/ui/Chip'
 import { UiIcon } from '@/components/ui/Icons'
@@ -10,6 +11,8 @@ import { useState } from 'react'
 
 export default function SettingsPage() {
   const navigate = useNavigate()
+  const courses = useContentStore((s) => s.courses)
+  const course = courses[0]
 
   const darkMode = useSettingsStore((s) => s.darkMode)
   const fontLevel = useSettingsStore((s) => s.fontLevel)
@@ -60,6 +63,28 @@ export default function SettingsPage() {
           <h1 className="text-xl font-bold text-[var(--text-main)]">Configuracion</h1>
           <p className="text-sm text-[var(--text-muted)] mt-1">Preferencias de la app</p>
         </header>
+
+        {/* Language */}
+        {course && (
+          <section className="mb-8">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-3">
+              Idioma
+            </h2>
+            <div
+              className="p-4 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border-soft)]"
+            >
+              <div className="flex items-center gap-3">
+                <UiIcon name="speaker" size={20} className="text-[var(--text-muted)]" />
+                <div>
+                  <p className="text-sm font-medium text-[var(--text-main)]">
+                    {course.language.target.toUpperCase()} / {course.language.native.toUpperCase()}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)]">{course.title}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Theme */}
         <section className="mb-8">

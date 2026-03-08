@@ -12,15 +12,16 @@ import { AudioControls } from '@/components/AudioControls'
 import { ProgressRing } from '@/components/ProgressRing'
 import { Button } from '@/components/ui/Button'
 import { UiIcon } from '@/components/ui/Icons'
-import { buildCues } from '@/lib/cueBuilder'
+import { buildCues, buildManualCues, sanitizeManualStarts } from '@/lib/cueBuilder'
+import { TimingEditor } from '@/components/TimingEditor'
 import { formatTime } from '@/lib/timingEngine'
-import { FONT_LEVELS, LINE_HEIGHTS } from '@/types'
+import { FONT_LEVELS, LINE_HEIGHTS, type AudioMode } from '@/types'
 
 export default function LessonLivePage() {
-  const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>()
+  const { courseId, chapterId, lessonId } = useParams<{ courseId: string; chapterId: string; lessonId: string }>()
   const navigate = useNavigate()
 
-  const lessonsByCourse = useContentStore((s) => s.lessonsByCourse)
+  const lessonsByChapter = useContentStore((s) => s.lessonsByChapter)
 
   const studyMode = useSettingsStore((s) => s.studyMode)
   const blindMode = useSettingsStore((s) => s.blindMode)
@@ -40,24 +41,49 @@ export default function LessonLivePage() {
 
   const recordLoopCompletion = useProgressStore((s) => s.recordLoopCompletion)
 
-  const lessons = courseId ? (lessonsByCourse[courseId] ?? []) : []
+  const lessons = chapterId ? (lessonsByChapter[chapterId] ?? []) : []
   const lessonData = lessons.find((l) => l.lesson.id === lessonId)
 
+  const audioMode: AudioMode = studyMode === 'interactive' && Boolean(lessonData?.audioInteractiveUrl)
+    ? 'interactive'
+    : 'normal'
+
   const [showCelebration, setShowCelebration] = useState(false)
+  const [showTimingEditor, setShowTimingEditor] = useState(false)
+
+  // Local timing overrides – updated instantly when the editor saves,
+  // without needing a page reload. Initially loaded from the VTT files
+  // that contentLoader picked up at startup.
+  const [localTimingNormal, setLocalTimingNormal] = useState<number[] | null>(
+    () => lessonData?.timingNormal ?? null,
+  )
+  const [localTimingInteractive, setLocalTimingInteractive] = useState<number[] | null>(
+    () => lessonData?.timingInteractive ?? null,
+  )
 
   const cues = useMemo(() => {
     if (!lessonData) return []
-    return buildCues(lessonData.cues)
-  }, [lessonData])
+    const drafts = audioMode === 'normal'
+      ? lessonData.cues.filter((c) => c.kind !== 'question')
+      : lessonData.cues
+    const savedStarts = audioMode === 'normal' ? localTimingNormal : localTimingInteractive
+    if (savedStarts && savedStarts.length === drafts.length) {
+      const fallback = buildCues(drafts).map((c) => c.start)
+      const totalDuration = savedStarts.at(-1) ?? 0
+      const cleaned = sanitizeManualStarts(savedStarts, drafts.length, totalDuration, fallback)
+      return buildManualCues(drafts, cleaned, totalDuration)
+    }
+    return buildCues(drafts)
+  }, [lessonData, audioMode, localTimingNormal, localTimingInteractive])
 
   const audioUrl = useMemo(() => {
     if (!lessonData) return null
-    return studyMode === 'interactive' && lessonData.audioInteractiveUrl
+    return audioMode === 'interactive'
       ? lessonData.audioInteractiveUrl
       : lessonData.audioNormalUrl
-  }, [lessonData, studyMode])
+  }, [lessonData, audioMode])
 
-  const fullLessonId = courseId && lessonId ? `${courseId}/${lessonId}` : ''
+  const fullLessonId = courseId && chapterId && lessonId ? `${courseId}/${chapterId}/${lessonId}` : ''
   const numericTarget = repeatTarget === 'inf' ? Infinity : repeatTarget
 
   const handleLoopComplete = useCallback((_loopNumber: number) => {
@@ -148,7 +174,7 @@ export default function LessonLivePage() {
 
   const handleBack = () => {
     resetSession()
-    navigate(`/course/${courseId}/lesson/${lessonId}/prep`)
+    navigate(`/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}/prep`)
   }
 
   const isPlaying = playbackStatus === 'playing' || playbackStatus === 'exploring'
@@ -164,7 +190,7 @@ export default function LessonLivePage() {
       <div className="app-shell min-h-dvh flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-lg font-semibold text-[var(--text-main)] mb-2">Leccion no encontrada</h2>
-          <Button variant="ghost" onClick={() => navigate(`/course/${courseId}`)}>Volver al curso</Button>
+          <Button variant="ghost" onClick={() => navigate(`/course/${courseId}/chapter/${chapterId}`)}>Volver al capítulo</Button>
         </div>
       </div>
     )
@@ -175,7 +201,9 @@ export default function LessonLivePage() {
       className={`app-shell min-h-dvh relative overflow-hidden select-none ${darkMode ? '' : 'theme-light'}`}
       style={{ '--line-height': lineHeight } as CSSProperties}
     >
-      <audio ref={audioRef} src={audioUrl || undefined} preload="metadata" />
+      <audio ref={audioRef} src={audioUrl || undefined} preload="metadata">
+        <track kind="captions" />
+      </audio>
 
       {/* Progress bar */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-[var(--surface)] z-30">
@@ -216,6 +244,18 @@ export default function LessonLivePage() {
           strokeWidth={3}
           className="shrink-0"
         />
+        <Button
+          variant="icon"
+          size="sm"
+          onClick={() => {
+            setPlaybackStatus('paused')
+            audioRef.current?.pause()
+            setShowTimingEditor(true)
+          }}
+          aria-label="Editar tiempos de sincronización"
+        >
+          <UiIcon name="edit" size={18} />
+        </Button>
       </header>
 
       {/* Main stage */}
@@ -335,10 +375,10 @@ export default function LessonLivePage() {
             <div className="flex flex-col gap-2">
               <Button
                 variant="primary"
-                onClick={() => navigate(`/course/${courseId}`)}
+                onClick={() => navigate(`/course/${courseId}/chapter/${chapterId}`)}
                 className="w-full"
               >
-                Volver al curso
+                Volver al capítulo
               </Button>
               <Button
                 variant="ghost"
@@ -353,6 +393,19 @@ export default function LessonLivePage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Timing editor overlay */}
+      {showTimingEditor && lessonData && (
+        <TimingEditor
+          lessonData={lessonData}
+          initialAudioMode={audioMode}
+          onSaved={(mode, starts) => {
+            if (mode === 'normal') setLocalTimingNormal(starts)
+            else setLocalTimingInteractive(starts)
+          }}
+          onClose={() => setShowTimingEditor(false)}
+        />
       )}
     </div>
   )

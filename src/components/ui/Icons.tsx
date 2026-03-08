@@ -20,6 +20,7 @@ type IconName =
   | 'info'
   | 'forward'
   | 'backward'
+  | 'edit'
 
 interface UiIconProps {
   name: IconName
@@ -83,6 +84,8 @@ export function UiIcon({ name, className = '', size = 20 }: UiIconProps) {
       return <svg {...props}><polygon points="5 4 15 12 5 20 5 4" fill="currentColor" stroke="none" /><line x1="19" y1="5" x2="19" y2="19" strokeWidth="2" /></svg>
     case 'backward':
       return <svg {...props}><polygon points="19 20 9 12 19 4 19 20" fill="currentColor" stroke="none" /><line x1="5" y1="19" x2="5" y2="5" strokeWidth="2" /></svg>
+    case 'edit':
+      return <svg {...props}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
     default:
       return null
   }

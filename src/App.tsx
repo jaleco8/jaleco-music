@@ -5,6 +5,7 @@ import { useProgressStore } from '@/stores/useProgressStore'
 
 const HomePage = lazy(() => import('@/pages/HomePage'))
 const CoursePage = lazy(() => import('@/pages/CoursePage'))
+const ChapterPage = lazy(() => import('@/pages/ChapterPage'))
 const LessonPrepPage = lazy(() => import('@/pages/LessonPrepPage'))
 const LessonLivePage = lazy(() => import('@/pages/LessonLivePage'))
 const SettingsPage = lazy(() => import('@/pages/SettingsPage'))
@@ -35,8 +36,9 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/course/:courseId" element={<CoursePage />} />
-          <Route path="/course/:courseId/lesson/:lessonId/prep" element={<LessonPrepPage />} />
-          <Route path="/course/:courseId/lesson/:lessonId/live" element={<LessonLivePage />} />
+          <Route path="/course/:courseId/chapter/:chapterId" element={<ChapterPage />} />
+          <Route path="/course/:courseId/chapter/:chapterId/lesson/:lessonId/prep" element={<LessonPrepPage />} />
+          <Route path="/course/:courseId/chapter/:chapterId/lesson/:lessonId/live" element={<LessonLivePage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

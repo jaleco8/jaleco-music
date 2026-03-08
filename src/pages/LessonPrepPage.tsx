@@ -23,11 +23,11 @@ import {
 } from '@/types'
 
 export default function LessonPrepPage() {
-  const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>()
+  const { courseId, chapterId, lessonId } = useParams<{ courseId: string; chapterId: string; lessonId: string }>()
   const navigate = useNavigate()
 
   const courses = useContentStore((s) => s.courses)
-  const lessonsByCourse = useContentStore((s) => s.lessonsByCourse)
+  const lessonsByChapter = useContentStore((s) => s.lessonsByChapter)
   const lessonProgress = useProgressStore((s) => s.lessonProgress)
 
   const studyMode = useSettingsStore((s) => s.studyMode)
@@ -46,15 +46,19 @@ export default function LessonPrepPage() {
   const applyPreset = useSettingsStore((s) => s.applyPreset)
 
   const course = courses.find((c) => c.id === courseId)
-  const lessons = courseId ? (lessonsByCourse[courseId] ?? []) : []
+  const lessons = chapterId ? (lessonsByChapter[chapterId] ?? []) : []
   const lessonData = lessons.find((l) => l.lesson.id === lessonId)
 
   const cues = useMemo(() => {
     if (!lessonData) return []
-    return buildCues(lessonData.cues)
-  }, [lessonData])
+    const isInteractive = studyMode === 'interactive' && Boolean(lessonData.audioInteractiveUrl)
+    const drafts = isInteractive
+      ? lessonData.cues
+      : lessonData.cues.filter((c) => c.kind !== 'question')
+    return buildCues(drafts)
+  }, [lessonData, studyMode])
 
-  const fullLessonId = courseId && lessonId ? `${courseId}/${lessonId}` : ''
+  const fullLessonId = courseId && chapterId && lessonId ? `${courseId}/${chapterId}/${lessonId}` : ''
   const progress = lessonProgress[fullLessonId]
   const hasAudio = Boolean(lessonData?.audioNormalUrl || lessonData?.audioInteractiveUrl)
 
@@ -63,7 +67,7 @@ export default function LessonPrepPage() {
       <div className="app-shell min-h-dvh flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-lg font-semibold text-[var(--text-main)] mb-2">Leccion no encontrada</h2>
-          <Button variant="ghost" onClick={() => navigate(`/course/${courseId}`)}>Volver al curso</Button>
+          <Button variant="ghost" onClick={() => navigate(courseId && chapterId ? `/course/${courseId}/chapter/${chapterId}` : '/')}>Volver al capítulo</Button>
         </div>
       </div>
     )
@@ -74,7 +78,7 @@ export default function LessonPrepPage() {
 
   const handleStartPractice = () => {
     if (cues.length === 0) return
-    navigate(`/course/${courseId}/lesson/${lessonId}/live`)
+    navigate(`/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}/live`)
   }
 
   const audioMode: AudioMode = studyMode === 'interactive' && lessonData.audioInteractiveUrl
@@ -91,12 +95,12 @@ export default function LessonPrepPage() {
           <Button
             variant="icon"
             size="sm"
-            onClick={() => navigate(`/course/${courseId}`)}
+            onClick={() => navigate(`/course/${courseId}/chapter/${chapterId}`)}
             className="mb-3 -ml-2"
-            aria-label="Volver al curso"
+            aria-label="Volver al capítulo"
           >
             <UiIcon name="back" size={20} />
-            <span className="text-sm">{course.title}</span>
+            <span className="text-sm">{course.chapters?.find((ch) => ch.id === chapterId)?.title ?? course.title}</span>
           </Button>
 
           <h1 className="text-xl font-bold text-[var(--text-main)]">

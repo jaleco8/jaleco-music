@@ -23,18 +23,29 @@ export const buildCueDrafts = (text: string, parseByPairs: boolean): CueDraft[] 
     return lines.map((line) => ({ text: line, kind: classifyCueText(line) }))
   }
 
+  // Text format is triplets: English statement, Spanish translation, Question
+  // Parse smartly: pair statement+translation, keep question standalone
   const drafts: CueDraft[] = []
+  let i = 0
 
-  for (let index = 0; index < lines.length; index += 2) {
-    const target = lines[index]
-    if (!target) continue
+  while (i < lines.length) {
+    const line = lines[i]
+    const kind = classifyCueText(line)
 
-    const translation = lines[index + 1]
-    drafts.push({
-      text: target,
-      translation: translation ?? undefined,
-      kind: classifyCueText(target),
-    })
+    if (kind === 'question') {
+      drafts.push({ text: line, kind: 'question' })
+      i++
+    } else {
+      const nextLine = lines[i + 1]
+      const nextKind = nextLine ? classifyCueText(nextLine) : undefined
+      if (nextLine && nextKind === 'statement') {
+        drafts.push({ text: line, translation: nextLine, kind: 'statement' })
+        i += 2
+      } else {
+        drafts.push({ text: line, kind: 'statement' })
+        i++
+      }
+    }
   }
 
   return drafts
