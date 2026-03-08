@@ -1,0 +1,79 @@
+I must be at work at 8:00 am.
+Debo estar en el trabajo a las 8 de la mañana.
+Do I have to be at work at 8:00 am? [YES/NO], I do.
+
+I have many bills, so I have to work.
+Tengo muchas facturas, así que tengo que trabajar.
+Do I work so I can pay my bills? [YES/NO], I do.
+
+My shift is from 8:00 am to 5:00 pm.
+Mi turno es de 8 de la mañana a 5 de la tarde.
+Is my work shift over at 4:00 pm? [YES/NO], I work until 5:00.
+
+I work at a call center.
+Trabajo en un centro de llamadas.
+Do I work at a factory? [YES/NO], I do not.
+
+Customers call me when they have questions.
+Los clientes me llaman cuando tienen preguntas.
+Do customers call me when they have a question? [YES/NO], they do.
+
+When the phone rings, I say, "How may I help you today?"
+Cuando suena el teléfono, digo: "¿En qué puedo ayudarle hoy?".
+When the phone rings do I say, "I can't help you now." [YES/NO], I do not.
+
+I answer questions about their payments.
+Respondo a preguntas sobre sus pagos.
+Do I answer questions about their payments? [YES/NO], I do.
+
+I also solve problems.
+También resuelvo problemas.
+Do I solve their problems? [YES/NO], I do.
+
+I help customers fix their computers.
+Ayudo a los clientes a arreglar sus ordenadores.
+Do I help customers fix their phones? [YES/NO], I do not.
+
+I tell them to check to see if it's plugged in.
+Les digo que comprueben si está enchufado.
+Do I tell them to turn their computers on? [YES/NO], I do not.
+
+Then I ask them to restart.
+Luego les pido que lo reinicien.
+Do I ask them to restart their computer? [YES/NO], I do.
+
+Sometimes I can't fix the problem.
+A veces no puedo solucionar el problema.
+Do I fix every problem? [YES/NO], I do not.
+
+Then I call my supervisor.
+Entonces llamo a mi supervisor.
+Do I call my co-worker when I can't fix a problem? [YES/NO], I do not.
+
+My supervisor is very helpful.
+Mi supervisor es muy servicial.
+Is my supervisor helpful? [YES/NO], she is.
+
+I answer questions all morning.
+Respondo preguntas toda la mañana.
+Do I answer questions all morning? [YES/NO], I do.
+
+Then I take a break for lunch.
+Luego hago una pausa para comer.
+Do I take a break and play games? [YES/NO], I eat lunch.
+
+After I eat, I begin answering calls again.
+Después de comer, vuelvo a responder a las llamadas.
+After lunch, do I go home? [YES/NO], I do not.
+
+I work weekdays.
+Trabajo entre semana.
+Do I work on Saturday? [YES/NO], I work weekdays.
+
+On Friday, I get paid.
+El viernes me pagan.
+Do I get paid on Thursday? [YES/NO], I get paid on Friday.
+
+I am glad I can work and earn money.
+Me alegro de poder trabajar y ganar dinero.
+Am I sad that I can work? [YES/NO], I am glad.

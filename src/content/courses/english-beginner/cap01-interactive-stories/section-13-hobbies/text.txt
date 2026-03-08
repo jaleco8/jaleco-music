@@ -1,0 +1,79 @@
+Having a hobby helps me relax.
+Tener un hobby ayuda a relajarme.
+Do hobbies help me relax? [YES/NO], they do.
+
+I do my hobby in my free time.
+Practico mi afición en mi tiempo libre.
+Do I do my hobby at work? [YES/NO], I do not.
+
+I like to be outside.
+Me gusta estar al aire libre.
+Do I like to be indoors? [YES/NO], I like being outside.
+
+I like to walk.
+Me gusta caminar.
+Do I like to play chess? [YES/NO], I like to walk.
+
+So my hobby is hiking.
+Así que mi afición es el senderismo.
+Is my hobby hiking? [YES/NO], it is.
+
+My best friend likes to draw.
+A mi mejor amiga le gusta dibujar.
+Does my best friend like to paint? [YES/NO], my friend likes to draw.
+
+I like her pictures of animals.
+Me gustan sus dibujos de animales.
+Do I like her pictures of animals? [YES/NO], I do.
+
+I hung one of her drawings in my home.
+He colgado uno de sus dibujos en mi casa.
+Did I hang one of her drawings in my office? [YES/NO], I didn't.
+
+My mother's hobby is sewing.
+La afición de mi madre es coser.
+Is sewing my mother's hobby? [YES/NO], it is.
+
+She sews clothes.
+Ella cose ropa.
+Does she sew clothes? [YES/NO], she does.
+
+My father likes woodworking.
+A mi padre le gusta trabajar la madera.
+Is my father's hobby sailing? [YES/NO], it is woodworking.
+
+I have a birdhouse he made.
+Tengo una pajarera que hizo él.
+Did my father make a birdhouse? [YES/NO], he did.
+
+The birdhouse is in my backyard.
+La pajarera está en mi jardín.
+Is the birdhouse in my sister's yard? [YES/NO], it isn't.
+
+My brother's hobby is playing video games.
+La afición de mi hermano es jugar videojuegos.
+Is my brother's hobby playing tennis? [YES/NO], it isn't.
+
+I like to play with him.
+Me gusta jugar con él.
+Do I play games with him? [YES/NO], I do.
+
+My neighbor's hobby is skydiving.
+El hobby de mi vecino es el paracaidismo.
+Is skydiving my neighbor's hobby? [YES/NO], it is.
+
+I don't think I would like to skydive.
+Creo que no me gustaría hacer paracaidismo.
+Would I like skydiving? [YES/NO], I would not.
+
+My girlfriend's hobby is shopping.
+La afición de mi novia es ir de compras.
+Does my girlfriend have a shopping hobby? [YES/NO], she does.
+
+I know she shops every day.
+Sé que va de compras todos los días.
+Does my girlfriend shop every day? [YES/NO], she does.
+
+I told her she needs more money for her hobby!
+Le he dicho que necesita más dinero para su afición.
+Did I tell her she needs more money for her hobby? [YES/NO], I did.

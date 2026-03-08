@@ -1,0 +1,79 @@
+My country has an interesting culture.
+Mi país tiene una cultura interesante.
+Does my country have a boring culture? [YES/NO], it doesn't.
+
+I celebrate holidays.
+Celebro las fiestas.
+Do I celebrate holidays? YES/NO], I do.
+
+My favorite is the Day of the Dead.
+Mi favorita es el Día de los Muertos.
+Is Labor Day my favorite? [YES/NO], it is not.
+
+I visit my family.
+Visito a mi familia.
+Do I stay at home on the Day of the Dead? [YES/NO], I don't.
+
+We remember those who have died.
+Recordamos a los que han muerto.
+Do I remember those who have died? [YES/NO], I do.
+
+I also like the Christmas holiday.
+También me gusta la Navidad.
+Do I like the Christmas holiday? [YES/NO], I do like Christmas.
+
+At Christmas I see poinsettia flowers.
+En Navidad veo flores de Pascua.
+Do I see Christmas trees? [YES/NO], I don't.
+
+Mexico has beautiful art too.
+México también tiene un arte precioso.
+Does Mexico have beautiful art? [YES/NO], it does.
+
+I visit an art festival.
+Visito un festival de arte.
+Do I visit a museum? [YES/NO], I don't.
+
+I enjoy looking at the paintings.
+Me gusta mirar los cuadros.
+Do I hate looking at paintings? [YES/NO], I enjoy looking at paintings.
+
+I like pictures with bright colors.
+Me gustan los cuadros con colores vivos.
+Do I like pictures with dull colors? [YES/NO], I don't.
+
+My girlfriend likes the jewelry.
+A mi novia le gustan las joyas.
+Does my girlfriend like jewelry? [YES/NO], she does.
+
+I buy her a silver bracelet.
+Le compro una pulsera de plata.
+Did I buy her a ring? [YES/NO], I bought her a bracelet.
+
+My country has fun music too.
+En mi país también hay música divertida.
+Is the music in Mexico fun? [YES/NO], it is.
+
+I like to listen to Mariachi music.
+Me gusta escuchar música de mariachis.
+Do I like to listen to rock music? [YES/NO], I don't.
+
+Sometimes I dance too.
+A veces también bailo.
+Do I dance? [YES/NO], I do.
+
+I love to eat Mexican food.
+Me encanta comer comida mexicana.
+Do I love to eat Italian food? [YES/NO], I do not.
+
+Tamales are my favorite.
+Los tamales son mis favoritos.
+Are tamales my favorite? [YES/NO], they are.
+
+But my girlfriend prefers tostadas.
+Pero mi novia prefiere las tostadas.
+Does my girlfriend prefer tacos? [YES/NO], she doesn't.
+
+Art, music, food, and holidays are part of my culture.
+El arte, la música, la comida y las fiestas forman parte de mi cultura.
+Is my work part of my culture? [YES/NO], it isn't.

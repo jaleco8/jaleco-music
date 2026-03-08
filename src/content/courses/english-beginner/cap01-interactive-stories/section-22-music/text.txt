@@ -1,0 +1,79 @@
+I am a music teacher.
+Soy profesor de música.
+Am I an art teacher? [YES/NO], I am a music teacher.
+
+I want to teach about different types of music.
+Quiero enseñar distintos tipos de música.
+Do I want to teach about different types of music? [YES/NO], I do.
+
+I search for classical music recordings.
+Busco grabaciones de música clásica.
+Do I search for jazz recordings? [YES/NO], I don't.
+
+I like the violin, piano, and cello in classical music.
+Me gusta el violín, el piano y el violonchelo en la música clásica.
+Do I like the cello? [YES/NO], I do.
+
+Next I search for country music.
+Luego busco música country.
+Do I search for country music next? [YES/NO], I do.
+
+I like the lyrics in country music.
+Me gustan las letras de la música country.
+Do I like the lyrics in country music? [YES/NO], I do.
+
+I want to line dance when I hear this music!
+Quiero bailar en línea cuando oigo esta música.
+Do I want to line dance? [YES/NO], I do.
+
+My students like hip-hop and rap music.
+A mis alumnos les gusta el hip-hop y el rap.
+Do my students like rap music? [YES/NO], I do.
+
+I like the rhythm and beat in these songs.
+Me gusta el ritmo y el compás de estas canciones.
+Do I like the lyrics in these songs? [YES/NO], I don't.
+
+I also teach about traditional music too.
+También enseño música tradicional.
+Do I also teach about traditional music? [YES/NO], I do.
+
+I find examples of Mariachi music.
+Encuentro ejemplos de música de mariachi.
+Am I able to find examples of Mariachi music? [YES/NO], I am.
+
+I want to play in a Mariachi band.
+Quiero tocar en un grupo de mariachis.
+Do you want to play in a Mariachi band? [YES/NO], I do.
+
+I can play the trumpet.
+Sé tocar la trompeta.
+Can I play the flute? [YES/NO], I can.
+
+I teach rock music too.
+También enseño música rock.
+Do I teach about rock music? [YES/NO], I do.
+
+The drums and electric guitar are my favorites.
+La batería y la guitarra eléctrica son mis favoritas.
+Are the drums and electric guitar my favorites? [YES/NO], they are.
+
+Music makes me feel emotions.
+La música me hace sentir emociones.
+Does music make me feel emotions? [YES/NO], it does.
+
+Music can make me happy.
+La música me hace feliz.
+Can music make me angry? [YES/NO], music makes me happy.
+
+Music gets me excited.
+La música me emociona.
+Does music get me excited? [YES/NO], it does.
+
+Music helps me relax.
+La música me ayuda a relajarme.
+Does music help me relax? [YES/NO], it does.
+
+If I didn't have music, I would be sad.
+Si no tuviera música, estaría triste.
+Would I be happy without music? [YES/NO], I wouldn't.

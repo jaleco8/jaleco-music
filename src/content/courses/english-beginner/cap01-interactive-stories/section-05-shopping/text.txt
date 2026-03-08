@@ -1,0 +1,79 @@
+I buy groceries every week.
+Compro comida todas las semanas.
+Do I buy groceries every week? [YES/NO], I do.
+
+I shop at the supermarket every Thursday.
+Voy al supermercado todos los jueves.
+Do I shop at the supermarket on Fridays? [YES/NO], I don't. I shop on Thursdays.
+
+I make a list of the food I need.
+Hago una lista de los alimentos que necesito.
+Before I shop, do I make a list of what I need? [YES/NO], I do.
+
+This week, I need to buy many items.
+Esta semana necesito comprar muchos productos.
+This week, do I only need two items? [YES/NO], I need many.
+
+At the store, I use a shopping cart to carry the food.
+En el supermercado, uso un carrito para llevar la comida.
+Do I use a shopping cart at the store? [YES/NO], I do.
+
+In the produce department, I get potatoes, apples, and carrots.
+En la sección de frutas y verduras compro patatas, manzanas y zanahorias.
+Does the produce department have meat? [YES/NO], it has fruit and vegetables.
+
+In the meat department, I put beef and chicken in my cart.
+En la sección de carne, compro ternera y pollo.
+Do I get beef and lobster? [YES/NO], I do not.
+
+Hmm, where is the bread aisle? I will ask.
+¿Dónde está el pasillo del pan? pregunto.
+Do I know where to find bread? [YES/NO], I do not.
+
+"Excuse me sir, where can I find the bread?" – "Aisle five, sir."
+"Disculpe señor, ¿dónde puedo encontrar el pan?" - "Pasillo cinco, señor".
+Is the bread in aisle four? [YES/NO], it is in aisle five.
+
+My dog needs food.
+Mi perro necesita comida.
+Does my dog need food? [YES/NO], he does.
+
+I get dog food.
+Consigo comida para perros.
+Can I buy dog food at the supermarket? [YES/NO], I can.
+
+In the freezer section, there is ice cream. I get vanilla ice cream.
+En la sección de congelados hay helados. Compro helado de vainilla.
+Do I get vanilla ice cream? [YES/NO], I do.
+
+I remember that I need milk.
+Recuerdo que necesito leche.
+Do I need juice? [YES/NO], I need milk.
+
+And, I also put eggs in the cart.
+Y también pongo huevos en el carro.
+Do I get eggs? [YES/NO], I do.
+
+I have put all I need into the cart. I go to the check-out counters.
+Pongo todo lo que necesito en el carro. Voy a la caja.
+Do I leave the store when I have all my items? [YES/NO], I have to check out.
+
+I choose the self checkout counter.
+Elijo la caja automática.
+Do I choose the self checkout? [YES/NO], I do.
+
+The kiosk allows me to look up the cost of the potatoes.
+La máquina me permite consultar el precio de las patatas.
+Does the kiosk tell me the cost of potatoes? [YES/NO], it does.
+
+I use the scanner to add up the total cost of the food.
+Utilizo el escáner para sumar el precio total de los alimentos.
+Do I use a calculator to add up the cost of the food? [YES/NO], I don't.
+
+I pay for the groceries.
+Pago la compra.
+Do I pay for the groceries after I scan them? [YES/NO], I do.
+
+I get a receipt and go home.
+Me dan un recibo y me voy a casa.
+Do I go to the park after I get the receipt? [YES/NO], I go home.

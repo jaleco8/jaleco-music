@@ -1,0 +1,79 @@
+I live in Mexico.
+Vivo en México.
+Do I live in Peru? [YES/NO], I live in Mexico.
+
+I live in the state of Durango.
+Vivo en el estado de Durango.
+Do I live in the state of Durango? [YES/NO], I do.
+
+My hometown is east of Mazatlan.
+Mi pueblo está al este de Mazatlán.
+Is my hometown west of Mazatlan? [YES/NO], it is not.
+
+The name of my town is Lerdo, Durango.
+El nombre de mi pueblo es Lerdo, Durango.
+Is the name of my town Lerdo? [YES/NO], it is.
+
+My hometown is small.
+Mi pueblo natal es pequeño.
+Is my hometown large? [YES/NO], it is a small town.
+
+I like the warm weather in my hometown.
+Me gusta el clima cálido de mi ciudad natal.
+Is the weather cold in my hometown? [YES/NO], the weather is warm.
+
+I can work and play outside all year.
+Puedo trabajar y jugar al aire libre todo el año.
+Can I work and play outside all year? [YES/NO], I can.
+
+I hike on trails near my town.
+Hago montañismo por senderos cercanos a mi ciudad.
+Do I hike on trails? [YES/NO], I do.
+
+My friends and I go to Victoria Park.
+Mis amigos y yo vamos al Parque Victoria.
+Do my friends and I go to Winton Park? [YES/NO], we don't.
+
+My town is well-known for its ice cream.
+Mi pueblo es conocido por sus helados.
+Is my town known for having ice cream? [YES/NO], it is.
+
+There are dairy farms near my town.
+Hay granjas lecheras cerca de mi pueblo.
+Are there dairy farms nearby? [YES/NO], there are.
+
+I went to school in Lerdo.
+Yo fui al colegio en Lerdo.
+Did I go to school in Mexico City? [YES/NO], I went to school in Lerdo.
+
+My school was near my home.
+Mi colegio estaba cerca de mi casa.
+Did I live near my school? [YES/NO], I did.
+
+I live in a yellow house.
+Vivo en una casa amarilla.
+Is my house gray? [YES/NO], it is yellow.
+
+My house has two bedrooms.
+Mi casa tiene dos dormitorios.
+Does my house have two bedrooms? [YES/NO], it does.
+
+I work downtown.
+Trabajo en el centro.
+Do I work on a farm? [YES/NO], I work downtown.
+
+My town has many shops.
+Mi ciudad tiene muchas tiendas.
+Does my town have many shops? [YES/NO], it does.
+
+I work in a jewelry store.
+Trabajo en una joyería.
+Do I work in a bookstore? [YES/NO], I work in a jewelry store.
+
+My town has art galleries too.
+En mi pueblo también hay galerías de arte.
+Does my town have art galleries? [YES/NO], it does.
+
+I think you will like my hometown.
+Creo que te gustará mi ciudad.
+Do I think you will like my hometown? [YES/NO], I do.

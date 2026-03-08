@@ -1,0 +1,75 @@
+I like to eat American food.
+Me gusta comer comida americana.
+Do I like to eat American food? [YES/NO], I do.
+
+I will order a hamburger meal.
+Puedo pedir una hamburguesa.
+Will I order a taco? [YES/NO], I won't.
+
+The waitress asks, "What can I get for you today?"
+La camarera pregunta: "¿Qué le sirvo hoy?".
+Does the waitress ask me to leave? [YES/NO], she doesn't.
+
+I reply, "I'll get the hamburger."
+Yo respondo: "La hamburguesa".
+Do I say I'll get the soup? [YES/NO], I don't.
+
+My hamburger can have toppings.
+Mi hamburguesa puede tener aderezos.
+Can my hamburger have toppings? [YES/NO], I can get toppings.
+
+I choose ketchup.
+Elijo ketchup.
+Do I choose mustard? [YES/NO], I choose ketchup.
+
+The waitress asks, "Do you want lettuce, tomato, or onions?"
+La camarera pregunta: "¿Quiere lechuga, tomate o cebolla?".
+Does the waitress ask if i want spinach? [YES/NO], she doesn't.
+
+"Lettuce and tomato," I answer.
+"Lechuga y tomate", respondo.
+Do I say I want bacon? [YES/NO], I don't.
+
+I don't like onions.
+No me gusta la cebolla.
+Do I like onions? [YES/NO], I don't.
+
+Cheese can be put on my hamburger.
+A mi hamburguesa le pueden poner queso.
+Is cheese an option to put on my hamburger? [YES/NO], it is.
+
+Then my hamburger is called a cheeseburger.
+Entonces mi hamburguesa se llama hamburguesa con queso.
+Does a cheeseburger have cheese on it? [YES/NO], it does.
+
+I like french fries to eat with my burger.
+Me gustan las patatas fritas para acompañar la hamburguesa.
+Do I like to get fries with my burger? [YES/NO], I do.
+
+"Can I get an order of fries?" I ask.
+"¿Puedo pedir una porción de papas fritas?", pregunto.
+Do I ask for an order of beans? [YES/NO], I don't.
+
+I get a large order of fries.
+Pido una porción grande de papas fritas.
+Do I get a small order of fries? [YES/NO], I don't.
+
+Last, the waitress asks what I want to drink.
+Por último, la camarera me pregunta qué quiero beber.
+Does the waitress ask if I want dessert? [YES/NO], she asks what I want to drink.
+
+"I want a small Coke," I tell her.
+"Quiero una Coca-Cola pequeña", le digo.
+Do I want a small Pepsi? [YES/NO], she doesn't.
+
+My girlfriend does not like hamburgers.
+A mi novia no le gustan las hamburguesas.
+Does my girlfriend like hamburgers? [YES/NO], she does not.
+
+I order a chicken sandwich for her.
+Pido un sándwich de pollo para ella.
+Do I order her a taco? [YES/NO], I order a chicken sandwich.
+
+My girlfriend does not want french fries.
+Mi novia no quiere patatas fritas.
+Does my girlfriend want french fries? [YES/NO], she does not.

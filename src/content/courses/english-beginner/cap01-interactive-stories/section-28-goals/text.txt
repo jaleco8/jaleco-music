@@ -1,0 +1,79 @@
+I graduate from high school in one year.
+Me gradúo de la escuela secundaria en un año.
+Do I graduate from high school in two years? [YES/NO], I do not.
+
+I have set four goals for my future.
+Me he fijado cuatro objetivos para mi futuro.
+Have I set four goals? [YES/NO], I have.
+
+A goal is something I want to do.
+Un objetivo es algo que quiero hacer.
+Is a goal something my mother wants me to do? [YES/NO], it is not.
+
+A goal is something I want to happen.
+Un objetivo es algo que quiero que ocurra.
+Is a goal something I want to happen? [YES/NO], it is.
+
+After graduation, I will take a gap year.
+Después de graduarme, me tomaré un año sabático.
+Will I take a gap year after graduation? [YES/NO], I will.
+
+I will do volunteer work.
+Haré trabajos de voluntariado.
+Will I do volunteer work? [YES/NO], I will.
+
+It is my goal to help the homeless.
+Mi objetivo es ayudar a las personas sin hogar.
+Do I have a goal to help the homeless? [YES/NO], I do.
+
+After that year, my goal is to go to college.
+Después de ese año, mi objetivo es ir a la universidad.
+Is my goal to go to college? [YES/NO], it is.
+
+I want to study to be a doctor.
+Quiero estudiar para ser médico.
+Will I study to be a doctor? [YES/NO], I will study to be a doctor.
+
+I will study and make good grades.
+Estudiaré y sacaré buenas notas.
+Will I study? [YES/NO], I will.
+
+When I'm in school I will work part-time.
+Cuando esté en la universidad trabajaré a tiempo parcial.
+Will I have a part-time job while I'm in school? [YES/NO], I will have a part-time job.
+
+After I become a doctor, I will work in rural villages.
+Cuando sea médico, trabajaré en aldeas rurales.
+When I become a doctor, will I work in the city? [YES/NO], I won't.
+
+My goal is to get married after medical school.
+Mi objetivo es casarme después de estudiar medicina.
+Is my goal to get married after medical school? [YES/NO], it is.
+
+I would like to have two children.
+Me gustaría tener dos hijos.
+Would I like to have three children? [YES/NO], I would like two children.
+
+When I am older, my goal is to live in the Caribbean.
+Cuando sea mayor, mi objetivo es vivir en el Caribe.
+Do I want to live in the Amazon? [YES/NO], I do not.
+
+I want a house on the beach.
+Quiero una casa en la playa.
+Do I want to have a house on the beach? [YES/NO], I do.
+
+These are my goals now.
+Estos son mis objetivos ahora.
+Are these the goals I have now? [YES/NO], they are.
+
+I will have to work hard to achieve my goals.
+Tendré que trabajar duro para conseguir mis objetivos.
+Can I accomplish my goals without working hard? [YES/NO], I can't.
+
+I can change my goals.
+Puedo cambiar mis objetivos.
+Can my goals change? [YES/NO], they can.
+
+These goals are my plan for now.
+Estos objetivos son mi plan por ahora.
+Are these goals my plan for now? [YES/NO], they are.

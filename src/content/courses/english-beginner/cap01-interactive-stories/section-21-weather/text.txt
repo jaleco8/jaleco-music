@@ -1,0 +1,79 @@
+I watch the weather forecast every night.
+Todas las noches miro la predicción del tiempo.
+Do I watch the weather forecast every morning? [YES/NO], I don't.
+
+I know tomorrow the weather will be sunny.
+Sé que mañana hará sol.
+Will the weather be rainy tomorrow? [YES/NO], it will be sunny.
+
+I think it might be too hot.
+Creo que hará demasiado calor.
+Do I think it will be hot? [YES/NO], I do.
+
+My friend Juan wants to jog.
+Mi amigo juan quiere trotar.
+Does Juan want to jog? [YES/NO], he does.
+
+But I will go swimming.
+Pero yo iré a nadar.
+Will I go swimming? [YES/NO], I will.
+
+On Tuesday, I see it's supposed to rain.
+El martes, veo que va a llover.
+Is it supposed to rain on Wednesday? [YES/NO], it is not.
+
+I like rainy weather.
+Me gusta el tiempo lluvioso.
+Do I like rainy weather? [YES/NO], I do.
+
+I have never seen snow.
+Nunca he visto la nieve.
+Have I ever seen snow? [YES/NO], I haven't.
+
+I would like to ski in snowy weather.
+Me gustaría esquiar con nieve.
+Would I like to ski? [YES/NO], I would.
+
+My friend Louisa is scared of storms.
+A mi amiga Louisa le dan miedo las tormentas.
+Does Lousia like storms? [YES/NO], she doesn't.
+
+I don't like stormy weather either.
+A mí tampoco me gusta el tiempo tormentoso.
+Do I like storm weather? [YES/NO], I don't.
+
+I don't like loud thunder.
+No me gustan los truenos fuertes.
+Do I like thunder? [YES/NO], I don't.
+
+My friend Louisa saw a tornado.
+Mi amiga Louisa vio un tornado.
+Did Lousia see a tornado? [YES/NO], she did.
+
+I don't ever want to see one.
+Yo no quiero ver uno nunca.
+Do I want to see a tornado? [YES/NO], I don't.
+
+I wish I could control the weather.
+Me gustaría poder controlar el tiempo.
+Do I wish I could control the weather? [YES/NO], I do.
+
+I would make it rain if it was too dry.
+Haría que lloviera si estuviera demasiado seco.
+Would I make it rain? [YES/NO], I would.
+
+I would make it snow so I could play.
+Haría que nevara para poder jugar.
+Would I make it snow? [YES/NO], I would.
+
+And I would never make it storm.
+Y nunca haría que hiciera tormenta.
+Would I make it storm? [YES/NO], I would not.
+
+It would never be too hot or too cold.
+Nunca haría demasiado calor ni demasiado frío.
+Would my weather ever be hot? [YES/NO], it wouldn't.
+
+I could be the Weather Wizard!
+¡Podría ser el Mago del Clima!
+Could I be a Weather Wizard? [YES/NO], I could.

@@ -1,0 +1,79 @@
+I think politics are interesting.
+Creo que la política es interesante.
+Do I think politics are interesting? [YES/NO], I do.
+
+I asked my American friend, "Do you vote?"
+Le pregunté a mi amiga americana: "¿Tú votas?".
+Did I ask my friend if they vote? [YES/NO], I did.
+
+She told me, "Yes, I vote in every election."
+Me dijo: "Sí, voto en todas las elecciones".
+Does my friend ever not vote? [YES/NO], she doesn't.
+
+I learned you have to be 18 years old to vote.
+Me enteré de que hay que tener 18 años para votar.
+Do you have to be 16 years old to vote? [YES/NO], you have to be 18.
+
+She told me you must be an American citizen.
+Me dijo que debes ser ciudadano estadounidense.
+Do you have to be a citizen to vote? [YES/NO], you do.
+
+I told her Mexico's President serves for six years.
+Le dije que el Presidente de México dura en el cargo seis años.
+Did I tell her Mexico's President serves for four years? [YES/NO], I did not.
+
+I learned America's President serves for four years.
+Aprendí que el Presidente de Estados Unidos dura cuatro años.
+Did I learn that America's President serves for four years? [YES/NO], I did.
+
+"Do you elect state leaders?" I asked.
+"¿Ustedes eligen a los líderes estatales?" le pregunté.
+Did I ask if she elects city leaders? [YES/NO], I did not.
+
+She told me, "A governor is a state leader."
+Me dijo: "Un gobernador es un líder estatal".
+Did she tell me a governor is a state leader? [YES/NO], she did.
+
+I went to a campaign rally.
+Fui a un encuentro de campaña.
+Did I go to a campaign rally? [YES/NO], I did.
+
+The politician told me what she would listen to the people.
+La política me dijo que escucharía a la gente.
+Did the politician say she would listen? [YES/NO], she did.
+
+She told me she would be a fair leader.
+Me dijo que sería una líder justa.
+Did she tell me she would be a bad leader? [YES/NO], she did not.
+
+I told her I wanted better crime laws.
+Le dije que quería mejores leyes contra el crimen.
+Did I tell her I wanted better crime laws? [YES/NO], I did.
+
+I think it is important to vote.
+Creo que es importante votar.
+Do I think it's silly to vote? [YES/NO], I do not.
+
+When I vote, I help elect good leaders.
+Cuando voto, ayudo a elegir buenos líderes.
+When I vote, do I help elect good leaders? [YES/NO], I do.
+
+I believe leaders should be honest.
+Creo que los líderes deben ser honestos.
+Do I think leaders should be liars? [YES/NO], I do not.
+
+One day, I will run for a political office.
+Algún día me presentaré a un cargo político.
+Will I run for political office one day? [YES/NO], I will.
+
+I will listen.
+Escucharé.
+Will I ignore the people? [YES/NO], I will listen.
+
+I will try my best to make my city better.
+Haré todo lo posible por mejorar mi ciudad.
+Will I try to make my city better? [YES/NO], I will.
+
+Citizens will vote for me.
+Los ciudadanos votarán por mí.
+Will citizens vote for me? [YES/NO], they will.

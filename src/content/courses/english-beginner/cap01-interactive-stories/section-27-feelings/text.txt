@@ -1,0 +1,75 @@
+My boyfriend tells me I'm moody.
+Mi novio me dice que soy temperamental.
+Does my brother tell me I'm moody? [YES/NO], he does not.
+
+This means I have lots of feelings.
+Esto significa que tengo muchos sentimientos.
+Does being moody mean I have lots of feelings? [YES/NO], it does.
+
+I feel many different emotions every day.
+Siento muchas emociones diferentes cada día.
+Do I feel different emotions every day? [YES/NO], I do.
+
+I get angry.
+Me enfado.
+Do I get jealous? [YES/NO], I don't.
+
+I get angry when he forgets my birthday.
+Me enfado cuando se olvida de mi cumpleaños.
+Do I get angry when he forgets my birthday? [YES/NO], I do.
+
+I feel happy too.
+También me siento feliz.
+Do I feel happy? [YES/NO], I do.
+
+I am happy when I am outdoors.
+Me siento feliz cuando estoy al aire libre.
+Am I happy when I'm outdoors? [YES/NO], I am.
+
+Sometimes I feel sad.
+A veces me siento triste.
+Do I sometimes feel resentment? [YES/NO], I do not.
+
+I feel sad when I get hurt.
+Me siento triste cuando me hacen daño.
+Do I feel sad when I get hurt? [YES/NO], I do.
+
+I feel sad when my dog runs away.
+Me siento triste cuando mi perro se escapa.
+Do I feel sad when my dog barks? [YES/NO], I don't.
+
+I feel disappointed when I can't go to a party.
+Me siento decepcionada cuando no puedo ir a una fiesta.
+Do I feel glad when I can't go to a party? [YES/NO], I do not.
+
+I feel scared when I watch a horror movie.
+Siento miedo cuando veo una película de terror.
+Do I feel scared when I watch a comedy movie? [YES/NO], I do not.
+
+When I got a pay raise at work, I was joyful.
+Cuando me subieron el sueldo en el trabajo, me alegré.
+Was I ashamed when I got a pay raise? [YES/NO], I was joyful.
+
+Then I felt frustrated.
+Luego me sentí frustrada
+Did I feel frustrated? [YES/NO], I did.
+
+My boss gave me work to do.
+Mi jefe me dio trabajo que hacer.
+Did my boss give me more work to do? [YES/NO], my boss gave me more work.
+
+But today I felt surprised!
+Pero hoy me he llevado una sorpresa.
+Did I feel surprised yesterday? [YES/NO], I did not.
+
+My boyfriend bought me an engagement ring!
+Mi novio me ha comprado un anillo de compromiso.
+Did my boyfriend buy me a necklace? [YES/NO], he did not.
+
+My different moods don't bother him too much!
+Mis cambios de humor no le molestan demasiado.
+Do my different moods bother him much? [YES/NO], they do not.
+
+I feel thankful because he puts up with me.
+Estoy agradecida porque me soporta.
+Do I feel thankful because he tolerates me? [YES/NO], I do.

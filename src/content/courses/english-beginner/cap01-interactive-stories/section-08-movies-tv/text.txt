@@ -1,0 +1,79 @@
+After work I like to watch TV.
+Después del trabajo me gusta ver la tele.
+Do I like to watch TV before work? [YES/NO], I don't.
+
+I watch a TV series about a detective.
+Veo una serie de televisión sobre un detective.
+Am I watching a TV series about a horse? [YES/NO], I am not.
+
+I watch this show every Tuesday night.
+Veo esta serie todos los martes por la noche.
+Do I watch this show on Tuesday night? [YES/NO], I do.
+
+I also watch a TV series that is streamed.
+También veo una serie de televisión en directo.
+Do I watch another TV show that is streamed? [YES/NO], I do.
+
+I can watch any episode any day I want.
+Puedo ver cualquier episodio el día que quiera.
+Can I watch any episode any day? [YES/NO], I can.
+
+Sometimes I watch ten episodes in one day!
+A veces veo diez episodios en un día.
+Do I watch five episodes in a day? [YES/NO], I watch ten.
+
+I missed work because I "binge-watched' a show.
+He faltado al trabajo porque me he "maratoneado" una serie.
+Did I miss work because I stayed home to watch a show? [YES/NO], I did.
+
+My friends and I also like to watch movies.
+A mis amigos y a mí también nos gusta ver películas.
+Do my friends like to watch movies? [YES/NO], they do.
+
+I like to go to the theater.
+A mí me gusta ir al teatro.
+Do I like to go to the library? [YES/NO], I like to go to the theater.
+
+I have to buy a ticket to see the movie.
+Tengo que comprar una entrada para ver la película.
+Do I have to buy a ticket to see the movie? [YES/NO], I do.
+
+My friends go to see the movie with me.
+Mis amigos van a ver la película conmigo.
+Do I go to the theater alone to see the movie? [YES/NO], I do not.
+
+I buy candy.
+Yo compro caramelos.
+Can you buy candy at the theater? [YES/NO], you can.
+
+But my friends buy popcorn and drinks.
+Pero mis amigos compran palomitas y bebidas.
+Do my friends buy popcorn? [YES/NO], they do.
+
+I see the movie on the huge screen.
+Veo la película en una pantalla enorme.
+Do I see the movie on a huge screen? [YES/NO], I do.
+
+I like to sit in the back seats of the theater.
+Me gusta sentarme en los asientos de atrás.
+Do I like to sit in the front of the theater? [YES/NO], I don't.
+
+My friends like to sit in the front seats.
+A mis amigos les gusta sentarse delante.
+Do my friends like to sit in the front of the theater? [YES/NO], they do.
+
+I can watch movies at home too.
+También puedo ver películas en casa.
+Can I watch movies at home? [YES/NO], I can.
+
+But I like the theater better.
+Pero me gusta más el cine.
+Do I like the theater better? [YES/NO], I do.
+
+The gigantic screen makes the movie exciting.
+La pantalla gigante hace que la película sea emocionante.
+Is the small movie screen fun? [YES/NO], it isn't.
+
+And, I like the snacks too!
+Y también me gustan los aperitivos.
+Do I like snacks? [YES/NO], I do.

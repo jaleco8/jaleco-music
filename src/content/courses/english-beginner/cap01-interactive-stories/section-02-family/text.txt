@@ -1,0 +1,79 @@
+I have a huge family.
+Tengo una familia enorme.
+Do I have a small family? [YES/NO], I don't.
+
+I have five brothers and six sisters.
+Tengo cinco hermanos y seis hermanas.
+Do I have six sisters? [YES/NO], I do.
+
+I have a mother and father. They are my parents.
+Tengo una madre y un padre. Ellos son mis padres.
+Are my mother and father my parents? [YES/NO], they are.
+
+I have a grandmother. She is 84 years old.
+Tengo una abuela. Tiene 84 años.
+Is my grandmother 74 years old? [YES/NO], she isn't.
+
+My oldest sister has one son.
+Mi hermana mayor tiene un hijo.
+Does my sister have two sons? [YES/NO], she doesn't.
+
+He is my nephew.
+Es mi sobrino.
+Is my sister's son my nephew? [YES/NO], he is.
+
+We live in Lima, Peru.
+Vivimos en Lima, Perú.
+Do I live in Lima? [YES/NO], I do.
+
+My mother has a brother.
+Mi madre tiene un hermano.
+Does my mother have a sister? [YES/NO], she doesn't.
+
+He is my uncle.
+Es mi tío.
+Is my mother's brother my uncle? [YES/NO], he is.
+
+My father has a sister.
+Mi padre tiene una hermana.
+Does my father have a sister? [YES/NO], he does.
+
+And she is my aunt.
+Y ella es mi tía.
+Is my father's sister called my uncle? [YES/NO], she isn't.
+
+My aunt and uncle live outside the city.
+Mi tía y mi tío viven fuera de la ciudad.
+Do my aunt and uncle live in the city center? [YES/NO], they don't.
+
+My aunt has one daughter.
+Mi tía tiene una hija.
+Does my aunt have a daughter? [YES/NO], she does.
+
+She is my cousin.
+Es mi prima.
+Is my aunt's daughter my cousin? [YES/NO], Yes, she is.
+
+I like to spend time with my family.
+Me gusta pasar tiempo con mi familia.
+Do I like to spend time with my family? [YES/NO], I do.
+
+I like to eat with my family.
+Me gusta comer con mi familia.
+Do I like to eat with my family? [YES/NO], I do.
+
+My family likes to play soccer.
+A mi familia le gusta jugar al fútbol.
+Does my family like to play baseball? [YES/NO], they don't.
+
+My brothers and sisters are good players.
+Mis hermanos y hermanas son buenos jugadores.
+Do my brothers and sisters play well? [YES/NO], they do.
+
+My father and mother like to watch us play.
+A mi padre y a mi madre les gusta vernos jugar.
+Do my parents like to watch us play soccer? [YES/NO], they do.
+
+My parents are happy when we play well.
+Mis padres nos animan cuando jugamos bien.
+Are my parents sad when we play well? [YES/NO], they aren't.

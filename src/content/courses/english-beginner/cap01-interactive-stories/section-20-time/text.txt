@@ -1,0 +1,79 @@
+I went to see a movie.
+Fui a ver una película.
+Did I go see my mother? [YES/NO], I did not.
+
+I arrived at the theater at 3:00 pm.
+Llegué al cine a las tres de la tarde.
+Did I arrive at the theater at 3:00 am? [YES/NO], I arrived at 3:00 pm.
+
+But I was early.
+Pero llegué pronto.
+Was I early? [YES/NO], I did.
+
+I asked the attendant, "What time does the movie start?"
+Le pregunté al encargado: "¿A qué hora empieza la película?".
+Did I ask what time the movie started? [YES/NO], I did.
+
+He told me, "The movie starts in thirty minutes."
+Me dijo: "La película empieza dentro de treinta minutos".
+Did the movie start in twenty minutes? [YES/NO], it started in thirty minutes.
+
+I watched the movie.
+Vi la película.
+Did I watch the movie? [YES/NO], I did.
+
+At home later, I baked a chicken.
+Más tarde, en casa, horneé un pollo.
+Later did I bake cookies? [YES/NO], I baked a chicken.
+
+I set the oven timer for one hour.
+Programé el temporizador del horno para una hora.
+Did I set the time for one hour? [YES/NO], I did.
+
+My chicken finished cooking at 7:00 pm.
+El pollo terminó de cocinarse a las 7 de la tarde.
+Was the chicken finished at 7:00 pm. [YES/NO], it was.
+
+I fell asleep at 11:00 in the evening.
+Me dormí a las once de la noche.
+Did I fall asleep at 10:00 in the morning? [YES/NO], I didn't.
+
+But I woke up at midnight.
+Pero me desperté a medianoche.
+Did I wake up at midnight? [YES/NO], I did.
+
+I was hungry.
+Tenía hambre.
+Was I thirsty? [YES/NO], I wasn't.
+
+I knew I shouldn't eat until morning.
+Sabía que no debía comer hasta por la mañana.
+Should I eat late at night? [YES/NO], I should not.
+
+I heard my alarm clock at 8:00 am.
+Oí el despertador a las 8 de la mañana.
+Did I hear my alarm at 6:00 am? [YES/NO], I didn't.
+
+I hate mornings.
+Odio las mañanas.
+Do I like mornings? [YES/NO], I don't.
+
+I drank a pot of coffee.
+Me tomé un café.
+Did I drink a cup of coffee? [YES/NO], I didn't.
+
+I wanted to shop for clothes.
+Quería comprar ropa.
+Did I want to go shopping? [YES/NO], I did.
+
+I called the store and asked, "What time do you open?"
+Llamé a la tienda y pregunté: "¿A qué hora abren?".
+Did I ask what time the store opened? [YES/NO], I did.
+
+The clerk told me, "10 o'clock."
+El dependiente me dijo: "A las 10".
+Did the store open at 10:00 am? [YES/NO], it did.
+
+I went to the store right way.
+Fui a la tienda enseguida.
+Did I wait to go to the store? [YES/NO], I went right away.

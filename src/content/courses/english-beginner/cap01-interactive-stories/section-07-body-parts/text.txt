@@ -1,0 +1,79 @@
+My body has many parts.
+Mi cuerpo tiene muchas partes.
+Does my body have many parts? [YES/NO], it does.
+
+My head has two ears.
+Mi cabeza tiene dos orejas.
+Do I have two ears? [YES/NO], I do.
+
+I have two eyes and a nose on my face.
+Tengo dos ojos y una nariz en la cara.
+Do I have one eye? [YES/NO], I have two.
+
+I use my eyes to see a beautiful flower.
+Uso mis ojos para ver una hermosa flor.
+Do I use my eyes to see a flower? [YES/NO], I do.
+
+My ears hear my rap music.
+Mis oídos escuchan mi música rap.
+Do my ears hear music? [YES/NO], they do.
+
+I taste my favorite food with my mouth.
+Con la boca pruebo mi comida favorita.
+Do I taste with my mouth? [YES/NO], I do.
+
+My body has two arms.
+Mi cuerpo tiene dos brazos.
+Does my body have three arms? [YES/NO], it has two.
+
+My arms have hands.
+Mis brazos tienen manos.
+Does my head have hands? [YES/NO], my arms have hands.
+
+My arms and hands hold the person I love.
+Mis brazos y mis manos abrazan a la persona que amo.
+Do I hold a cat with my hands? [YES/NO], I don't.
+
+I use my fingers to play the piano.
+Toco el piano con los dedos.
+Do my fingers play the flute? [YES/NO], I play the piano.
+
+I have two legs.
+Tengo dos piernas.
+Do I have two legs? [YES/NO], I do.
+
+My legs are attached to my hips.
+Mis piernas están unidas a mis caderas.
+Are my legs attached to my arms? [YES/NO], they are attached to my hips.
+
+On my legs I have knees.
+En mis piernas tengo rodillas.
+Do my legs have knees? [YES/NO], they do.
+
+At the end of each leg are my feet.
+Al final de cada pierna están mis pies.
+Do I have feet at the end of my legs? [YES/NO], I do.
+
+My feet are big.
+Mis pies son grandes.
+Are my feet small? [YES/NO], they are big.
+
+My feet have toes, and I have ten of them.
+Mis pies tienen dedos, y tengo diez.
+Do I have ten toes? [YES/NO], I do.
+
+I use my legs and feet to walk, and run.
+Uso las piernas y los pies para caminar y correr.
+Do I dance with my legs and feet? [YES/NO], I do not.
+
+When I am tired I sit on my butt.
+Cuando estoy cansado, me siento sobre mi trasero.
+Do I sit on my butt? [YES/NO], I do.
+
+I sometimes call my butt an ass.
+A veces llamo a mi trasero "nalgas".
+Is my butt also called an ass? [YES/NO], it is.
+
+But, my boyfriend calls my butt a booty!
+¡Pero, mi novio llama a mi trasero "un culo"!
+Does my boyfriend call my butt a backside? [YES/NO], he calls it a booty.

@@ -1,0 +1,79 @@
+My young son has many fears.
+Mi hijo pequeño tiene muchos miedos.
+Does my young son have fears? [YES/NO], he does.
+
+Each night I check his closet.
+Cada noche miro en su armario.
+Do I check his closet each night? [YES/NO], I do.
+
+Then I look under his bed.
+Luego miro debajo de su cama.
+Do I look under his desk? [YES/NO], I don't.
+
+He tells me to look for monsters.
+Me dice que busque monstruos.
+Do I look for monsters? [YES/NO], I do.
+
+I know he is scared of the dark too.
+Sé que también le da miedo la oscuridad.
+Is my son scared of the dark? [YES/NO], he is.
+
+I have three fears.
+Yo tengo tres miedos.
+Do I have four fears? [YES/NO], I don't.
+
+I am afraid of spiders.
+Me dan miedo las arañas.
+Am I afraid of cats? [YES/NO], I am not.
+
+I think spiders are creepy.
+Creo que las arañas son espeluznantes.
+Do I think spiders are creepy? [YES/NO], I do.
+
+I am also afraid of flying.
+También me da miedo volar.
+Am I afraid of flying? [YES/NO], I am.
+
+I will never fly in a plane!
+Nunca volaré en avión.
+Will I fly in a plane? [YES/NO], I will never fly.
+
+But mostly I am afraid of being alone.
+Pero sobre todo me da miedo estar sola.
+Am I afraid of being around people? [YES/NO], I am not.
+
+My boyfriend has fears too.
+Mi novio también tiene miedos.
+Does my boyfriend have fears? [YES/NO], he does.
+
+He told me he is afraid of getting sick.
+Me ha dicho que le da miedo ponerse enfermo.
+Is he afraid of snakes? [YES/NO], he is not.
+
+One day I found out he was scared of clowns.
+Un día descubrí que le daban miedo los payasos.
+Is he scared of clowns? [YES/NO], he is.
+
+I had dressed as a clown for a party.
+Me había disfrazado de payaso para una fiesta.
+Did I dress as a clown? [YES/NO], I did.
+
+He ran away from me, screaming.
+Se escapó de mí gritando.
+Did he walk away? [YES/NO], he ran away.
+
+I chased him.
+Le perseguí.
+Did I chase him? [YES/NO], I did.
+
+He screamed louder and I could not catch him.
+Gritaba más fuerte y no podía atraparlo.
+Was I able to catch him? [YES/NO], I was not.
+
+I will help him conquer his fear!
+Le ayudaré a vencer su miedo.
+Will I help him conquer his fear? [YES/NO], I will.
+
+I plan to dress as a clown next Halloween!
+Pienso disfrazarme de payaso el próximo Halloween.
+Am I planning to dress as a pirate next Halloween? [YES/NO], I am not.

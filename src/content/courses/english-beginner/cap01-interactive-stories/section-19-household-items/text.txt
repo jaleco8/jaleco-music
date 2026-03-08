@@ -1,0 +1,79 @@
+I rented my first apartment!
+¡He alquilado mi primer apartamento!
+Did I rent an apartment? [YES/NO], I did.
+
+My roommate, Bill and I need household items.
+Mi compañero de piso, Bill, y yo necesitamos artículos para el hogar.
+Is my roommate named Bill? [YES/NO], he is.
+
+I need a bed.
+Necesito una cama.
+Do I need a pillow? [YES/NO], I don't.
+
+I also need a table and chairs for the kitchen.
+También necesito una mesa y sillas para la cocina.
+Do I need a coffee maker? [YES/NO], I don't.
+
+Bill has a couch.
+Bill tiene un sofá.
+Does Bill have a couch? [YES/NO], he does.
+
+I think we need a chair for the living room.
+Creo que necesitamos una silla para la sala.
+Do I think we need a rug for the living room? [YES/NO], I don't.
+
+I need a large screen TV.
+Necesito un televisor de pantalla grande.
+Do I need a large screen TV? [YES/NO], I do.
+
+Bill disagrees.
+Bill no está de acuerdo.
+Does Bill want a large screen TV too? [YES/NO], he doesn't.
+
+I need things to cook with too.
+Yo también necesito cosas para cocinar.
+Do I need things to cook with? [YES/NO], I do.
+
+But Bill already has some.
+Pero Bill ya tiene algunas.
+Does Bill have some cooking items? [YES/NO], he does.
+
+"Do you have pots and pans?" I ask.
+"¿Tienes ollas y sartenes?" Le pregunto.
+Do I ask him if he has a coffee maker? [YES/NO], I ask about pots and pans.
+
+"Yes. But I don't have any dishes." Bill replies.
+"Sí, pero no tengo platos". responde Bill.
+Does Bill have dishes? [YES/NO], he doesn't.
+
+At the home store, I buy dishes.
+En la tienda del hogar, compro platos.
+Do I buy the dishes? [YES/NO], I do.
+
+I ask Bill to buy forks and spoons.
+Le pido a Bill que compre tenedores y cucharas.
+Does Bill buy knives? [YES/NO], he doesn't.
+
+I don't have bed sheets and towels.
+No tengo sábanas ni toallas.
+Do I have bed sheets? [YES/NO], I don't.
+
+Bill needs blankets.
+Bill necesita mantas.
+Does Bill need towels? [YES/NO], he doesn't.
+
+Bill and I go to another store.
+Bill y yo vamos a otra tienda.
+Does Bill go to another store with me? [YES/NO], he does.
+
+There I buy bed sheets and three towels.
+Allí compro sábanas y tres toallas.
+Do I buy six towels? [YES/NO], I buy three.
+
+I have very little money left.
+Me queda muy poco dinero.
+Do I have a great amount of money? [YES/NO], I don't.
+
+And, I still don't have a bed!
+Y todavía no tengo cama.
+Did I get a bed? [YES/NO], I didn't.

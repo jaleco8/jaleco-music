@@ -1,0 +1,75 @@
+I have many different desires.
+Tengo muchos deseos diferentes.
+Do I have many desires? [YES/NO], I do.
+
+A desire is something I really want.
+Un deseo es algo que realmente quiero.
+Is a desire something I really want? [YES/NO], it is.
+
+A desire is something I really want to happen.
+Un deseo es algo que realmente quiero que ocurra.
+Can a desire be something I want to happen? [YES/NO], it can.
+
+I desire American food.
+Deseo comida americana.
+Do I desire Thai food? [YES/NO], I do not.
+
+I really want a hot dog or apple pie.
+Deseo de verdad un perrito caliente o una tarta de manzana.
+Do I really want mashed potatoes? [YES/NO], I do not.
+
+I want a job where I don't work too hard.
+Quiero un trabajo en el que no trabaje demasiado.
+Do I want a job where I work too hard? [YES/NO], I don't.
+
+I desire good pay for the work I do.
+Deseo un buen sueldo por el trabajo que hago.
+Do I desire good pay? [YES/NO], I do.
+
+I desire my roommate to move out of my apartment.
+Deseo que mi compañero de piso se mude de mi apartamento.
+Do I desire for my roommate to live in my apartment? [YES/NO], I don't.
+
+He annoys me.
+Me molesta.
+Does he bother me? [YES/NO], he does.
+
+He plays the drums and I desire more peace and quiet.
+Toca la batería y deseo más paz y tranquilidad.
+Does he play the violin? [YES/NO], he plays the drums.
+
+I desire a girlfriend.
+Deseo una novia.
+Do I desire a girlfriend? YES/NO], I do.
+
+I want her to be beautiful.
+Quiero que sea guapa.
+Do I want her to be funny? [YES/NO], I do not.
+
+But more importantly, I want her to be smart and kind.
+Pero lo más importante es que sea inteligente y amable.
+Do I want her to be smart and kind? [YES/NO], I do.
+
+But I think it's ok if she has long beautiful legs too.
+Pero también me parece bien que tenga unas piernas largas y bonitas.
+Is it ok if she has beautiful legs? [YES/NO], it is ok.
+
+I desire more time to travel.
+Deseo más tiempo para viajar.
+Do I desire more time to travel? [YES/NO], I do.
+
+I want to see the world!
+Quiero ver el mundo.
+Do I want to see only Peru? [YES/NO], I want to see the world.
+
+Most of all I desire happiness.
+Y, sobre todo, deseo ser feliz.
+Do I desire happiness most? [YES/NO], I do.
+
+Good food and a good job makes me happy.
+La buena comida y un buen trabajo me hacen feliz.
+Does a good job and good food make me sad? [YES/NO], they make me happy.
+
+A smart, beautiful girlfriend would make me happy too.
+Una novia inteligente y guapa también me haría feliz.
+Would a smart, beautiful girlfriend make me happy? [YES/NO], that would make me happy.

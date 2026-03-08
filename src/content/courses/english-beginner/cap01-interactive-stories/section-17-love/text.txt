@@ -1,0 +1,79 @@
+I love many people.
+Quiero a mucha gente.
+Do I only love two people? [YES/NO], I love many.
+
+I love my family.
+Quiero a mi familia.
+Do I love my family? [YES/NO], I do.
+
+I love my mom because she takes care of everyone.
+Quiero a mi madre porque cuida de todos.
+Do I love my mom because she is funny? [YES/NO], I do not.
+
+I love my dad. He helps me build things.
+Quiero a mi padre. Me ayuda a construir cosas.
+Does my dad help me build things? [YES/NO], he does.
+
+I love my siblings. We play games.
+Quiero a mis hermanos. Nosotros jugamos.
+Do I hate my siblings? [YES/NO], I do not.
+
+My family cares for each other.
+Mi familia se preocupa por los demás.
+Does my family care for each other? [YES/NO], they do.
+
+I love my girlfriend.
+Quiero a mi novia.
+Do I like my girlfriend? [YES/NO], I love her.
+
+My love for her is different.
+Mi amor por ella es diferente.
+Is my love for her the same as family love? [YES/NO], it is different.
+
+My love for her is romantic love.
+Mi amor por ella es amor romántico.
+Is my love for her romantic? [YES/NO], it is.
+
+I take her on dates.
+Quiero salir con ella.
+Do I take my girlfriend on dates? [YES/NO], I do.
+
+Because I love her I want to kiss her.
+Porque la quiero, quiero besarla.
+Do I want to kiss her? [YES/NO], I do.
+
+I like holding her too.
+También me gusta abrazarla.
+Do I like holding my girlfriend? [YES/NO], I do.
+
+I love my friends.
+Yo quiero a mis amigos.
+Do I love my friends? [YES/NO], I do.
+
+My love for my friends is not romantic love.
+Mi amor por mis amigos no es amor romántico.
+Is my love for my friends romantic love? [YES/NO], it is not.
+
+My friends help me.
+Mis amigos me ayudan.
+Do my friends ignore me if I need help? [YES/NO], they help me.
+
+I help them when they need help too.
+Yo también les ayudo cuando lo necesitan.
+Do I help my friends? [YES/NO], I do.
+
+But I do not want to kiss my friends!
+Pero no quiero besar a mis amigos.
+Do I want to kiss my friends? [YES/NO], I do.
+
+I even love my dog.
+Incluso quiero a mi perro.
+Do I love my dog? [YES/NO], I do.
+
+My dog loves me too. He licks my face.
+Mi perro también me quiere. Me lame la cara.
+Does my dog bite my face? [YES/NO], no it licks my face.
+
+I guess my dog likes to kiss me!
+Supongo que a mi perro le gusta besarme.
+Does my dog like to kiss me? [YES/NO], it does.

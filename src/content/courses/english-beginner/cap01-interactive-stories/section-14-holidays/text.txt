@@ -1,0 +1,79 @@
+Holidays are a fun time of year.
+Las vacaciones son una época divertida del año.
+Do I think holidays are fun? [YES/NO], I do.
+
+I am off work on most holidays.
+La mayoría de los días festivos no trabajo.
+Do I work on holidays? [YES/NO], I don't.
+
+I like Halloween.
+Me gusta Halloween.
+Do I dislike Halloween? [YES/NO], I like Halloween.
+
+I wonder what kind of costume my sister will wear.
+Me pregunto qué disfraz llevará mi hermana.
+Do I know what my sister will wear? [YES/NO], I don't.
+
+"What are you wearing on Halloween?"
+"¿Qué te vas a poner en Halloween?"
+Did I ask her what she would wear for Labor Day? [YES/NO], I did not.
+
+My sister said she wants to be a cat.
+Mi hermana dice que quiere ser un gato.
+Does my sister want to be a cat? [YES/NO], she does.
+
+I want to wear a scary costume.
+Yo quiero llevar un disfraz terrorífico.
+Do I want to wear a funny costume? [YES/NO], I don't.
+
+I will dress as a zombie!
+Me disfrazaré de zombi.
+Am I going to dress up as a zombie? [YES/NO], I am.
+
+I plan to eat candy on Halloween.
+Pienso comer caramelos en Halloween.
+Am I planning on eating vegetables on Halloween? [YES/NO], I am not.
+
+My family will cut faces on pumpkins.
+Mi familia cortará caras en las calabazas.
+Will my family cut faces on pumpkins? [YES/NO], they will.
+
+Christmas is another holiday I like.
+La Navidad es otra fiesta que me gusta.
+Do I like Christmas? [YES/NO], I do.
+
+I will go to my parent's house on Christmas Eve.
+Iré a casa de mis padres en Nochebuena.
+Will I visit my family on Christmas Day? [YES/NO], I will.
+
+I want to buy my friend Joe a gift.
+Quiero comprarle un regalo a mi amigo Joe.
+Do I want to buy Chris a gift? [YES/NO], I do not.
+
+I will ask Joe, "What would you like for Christmas?"
+Le preguntaré a Joe: "¿Qué te gustaría para Navidad?".
+Will I ask Joe what he wants? [YES/NO], I will.
+
+"I want a new video game for my Xbox", says Joe.
+"Quiero un nuevo videojuego para mi Xbox", dice Joe.
+Does Joe want a video game? [YES/NO], he does.
+
+My mother wants a new sweater.
+Mi madre quiere un suéter nuevo.
+Does my mother want a new coat? [YES/NO], she does not.
+
+My dad wants new tools.
+Mi padre quiere herramientas nuevas.
+Does my dad want new shoes? [YES/NO], he does not.
+
+I will see Nativity scenes in town.
+Veré pesebres en la ciudad.
+Will I see Nativity scenes in town? [YES/NO], I will.
+
+But my American friends decorate Christmas trees.
+Pero mis amigos americanos decoran árboles de Navidad.
+Do my American friends decorate Christmas trees? [YES/NO], they do.
+
+I look forward to celebrating holidays.
+Estoy deseando celebrar las fiestas.
+Do I look forward to celebrating? [YES/NO], I do.

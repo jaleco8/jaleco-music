@@ -1,0 +1,79 @@
+Exercise is good for my body.
+El ejercicio es bueno para mi cuerpo.
+Is exercise good for my body? [YES/NO], it is.
+
+Exercise makes me strong.
+El ejercicio me fortalece.
+Does exercise make me weak? [YES/NO], it makes me strong.
+
+It keeps me healthy too.
+También me mantiene sano.
+Does exercise make me healthy? [YES/NO], it does.
+
+I like to exercise five ways.
+Me gusta hacer ejercicio de cinco maneras.
+Do I like to exercise six ways? [YES/NO], I do not.
+
+Jogging is my favorite.
+Mi favorito es trotar.
+Is jogging my favorite? [YES/NO], it is.
+
+I jog in my neighborhood.
+Corro por mi barrio.
+Do I jog in the park? [YES/NO], I do not.
+
+I jog around my town.
+Corro por mi ciudad.
+Do I jog in my town? [YES/NO], I do.
+
+I like to swim too.
+También me gusta nadar.
+Do I hate swimming? [YES/NO], I like swimming.
+
+I swim in a pool.
+Nado en la piscina.
+Do I swim in a pool? [YES/NO], I do.
+
+But I also swim in the ocean.
+Pero también nado en el mar.
+Do I also swim in the river? [YES/NO], I swim in the ocean too.
+
+There is a gym in my town.
+En mi ciudad hay un gimnasio.
+Is there a gym in my town? [YES/NO], there is.
+
+There I can lift weights.
+Allí puedo levantar pesas.
+Can I lift weights there? [YES/NO], I can.
+
+Lifting weights makes muscles bigger.
+Levantar pesas aumenta el tamaño de los músculos.
+Does lifting weights make my muscles smaller? [YES/NO], it does not.
+
+I can run on a treadmill there too.
+También puedo correr en la caminadora.
+Can I run on a treadmill at the gym? [YES/NO], I can.
+
+My friend and I do yoga too.
+Mi amiga y yo también hacemos yoga.
+Do I do yoga alone? [YES/NO], I don't.
+
+Yoga helps me stay flexible.
+El yoga me ayuda a mantenerme flexible.
+Does yoga help me be flexible? [YES/NO], it does.
+
+Stretching is good for my body.
+Los estiramientos son buenos para mi cuerpo.
+Is stretching bad for my body? [YES/NO], it is good for my body.
+
+Walking on the beach is good exercise.
+Caminar por la playa es un buen ejercicio.
+Do I walk in the forest? [YES/NO], I walk on the beach.
+
+I walk three kilometers.
+Yo camino tres kilómetros.
+Do I walk three kilometers? [YES/NO], I do.
+
+I enjoy different kinds of exercise.
+Me gustan los distintos tipos de ejercicio.
+Do I like only one type of exercise? [YES/NO], I like many.

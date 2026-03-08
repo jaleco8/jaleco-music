@@ -1,0 +1,83 @@
+My family and I like animals.
+A mi familia y a mí nos gustan los animales.
+Does my family like animals? [YES/NO], they do.
+
+I have a dog.
+Tengo un perro.
+Do I have a cat? [YES/NO], I don't.
+
+My parents have two cats.
+Mis padres tienen dos gatos.
+Do my parents have four cats? [YES/NO], my parents have two.
+
+My sister has three goldfish and a parakeet.
+Mi hermana tiene tres peces de dorados y un periquito.
+Does my sister have a dog? [YES/NO], she doesn't.
+
+My family's animals are pets.
+Los animales de mi familia son mascotas.
+Does my family have pets? [YES/NO], they have pets.
+
+In my country there are many wild animals.
+En mi país hay muchos animales salvajes.
+Does my country have wild animals? [YES/NO], it does.
+
+In the jungle, I have seen a jaguar.
+En la selva, he visto un jaguar.
+Have I seen a bear in the jungle? [YES/NO], I have seen a jaguar.
+
+I once stepped on a large anaconda.
+Una vez me tropecé con una gran anaconda.
+Did I step on a monkey? [YES/NO], I didn't.
+
+That snake tried to eat me!
+Esa serpiente intentó comerme.
+Did the snake try to eat me? [YES/NO], it did.
+
+My favorite wild animal is the toucan.
+Mi animal salvaje favorito es el tucán.
+Is my favorite wild animal the tree frog? [YES/NO], it isn't.
+
+I like this bird's feathers.
+Me gustan las plumas de este pájaro.
+Do I like the bird's feathers? [YES/NO], I do.
+
+My friend has a farm.
+Mi amigo tiene una granja.
+Does my friend have a farm? [YES/NO], he does.
+
+I like his farm animals.
+Me gustan sus animales.
+Do I hate farm animals? [YES/NO], I like farm animals.
+
+I like eating the eggs laid by the chickens.
+Me gusta comer los huevos que ponen las gallinas.
+Do the chickens lay eggs? [YES/NO], they do.
+
+The cows give my family milk.
+Las vacas dan leche a mi familia.
+Do the cows give milk? [YES/NO], they do.
+
+I like petting the alpaca.
+Me gusta acariciar a la alpaca.
+Do I like petting the cows? [YES/NO], I don't.
+
+But once the alpaca spit on me.
+Pero una vez la alpaca me escupió.
+Did the alpaca spit on me? [YES/NO], it did.
+
+My country has lots of insects and bugs too.
+En mi país también hay muchos insectos y bichos.
+Are there a large amount of bugs in my country? [YES/NO], there are.
+
+I do not like them.
+No me gustan.
+Do I love bugs? [YES/NO], I don't.
+
+I am afraid of spiders.
+Me dan miedo las arañas.
+Would I want to keep a spider as a pet? [YES/NO], I wouldn't.
+
+I would rather look at butterflies!
+Prefiero ver mariposas.
+Do I like to look at butterflies? [YES/NO], I do.

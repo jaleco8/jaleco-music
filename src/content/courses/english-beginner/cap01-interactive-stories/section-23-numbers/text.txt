@@ -1,0 +1,75 @@
+I saw a beautiful woman at the beach.
+Vi a una hermosa mujer en la playa.
+Did I see a beautiful woman? [YES/NO], I did.
+
+I asked, "What is your phone number?"
+Le pregunté: "¿Cuál es tu número de teléfono?".
+Did I ask for her credit card number? [YES/NO], I did not.
+
+She replied, "876-241-9854."
+Ella respondió: "876-241-9854".
+Did she tell me her phone number? [YES/NO], she did.
+
+I called her and asked her out.
+La llamé y la invité a salir.
+Did I send her a text message? [YES/NO], I called.
+
+She said yes. My date was in two days.
+Me dijo que sí. Mi cita era en dos días.
+Was my date in three days? [YES/NO], it wasn't.
+
+I picked her up. She had two dogs.
+Pasé a recogerla. Tenía dos perros.
+Did she have three dogs? [YES/NO], she didn't.
+
+I noticed she had five birds.
+Me di cuenta de que tenía cinco pájaros.
+Did I see five birds? [YES/NO], I did.
+
+In a fish tank I counted nine fish.
+En una pecera conté nueve peces.
+Did I count seven fish? [YES/NO], I counted nine.
+
+I said, "You have many pets."
+Le dije: "Tienes muchas mascotas".
+Did I say she had many pets? [YES/NO], I did.
+
+She told me she had more.
+Me dijo que tenía más.
+Did she tell me she didn't have any more? [YES/NO], she didn't.
+
+I then saw many cats.
+Luego vi muchos gatos.
+Did I see a few cats? [YES/NO], I saw many.
+
+I counted. There were twelve cats!
+Los conté. Había doce gatos.
+Did I count twelve cats? [YES/NO], I did.
+
+She led me outside.
+Me llevó fuera.
+Did she lead me outside? [YES/NO], she did.
+
+In her yard, I counted 17 chickens, and 1 rooster.
+En su patio, conté 17 gallinas y un gallo.
+Did I count 17 chickens in the yard? [YES/NO], I did.
+
+I wondered if there were any more.
+Me pregunté si habría más.
+Did I wonder if there were more? [YES/NO], I did.
+
+I then felt something grab my leg.
+Entonces sentí que algo me agarraba la pierna.
+Did I feel something grab my arm? [YES/NO], I didn't.
+
+I looked down and saw a monkey.
+Miré hacia abajo y vi un mono.
+Did I see a monkey? [YES/NO], I did.
+
+The monkey climbed up my leg.
+El mono trepó por mi pierna.
+Did the monkey climb up my leg? [YES/NO], it did.
+
+I left her home. She was not the woman for me!
+Me fui de su casa. No era la mujer para mí.
+Did I leave the woman's house? [YES/NO], I did.

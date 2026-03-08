@@ -1,0 +1,79 @@
+I am traveling to Rome, Italy, today.
+Hoy viajo a Roma, Italia.
+Am I traveling to Rome today? [YES/NO], I am.
+
+I need several items to travel.
+Necesito varias cosas para viajar.
+Do I need only one item to travel? [YES/NO], I need several.
+
+I need a passport.
+Necesito un pasaporte.
+Do I need a passport? [YES/NO], I do.
+
+I can't travel outside the country without a passport.
+No puedo viajar fuera del país sin pasaporte.
+Can I travel outside the country without a passport? [YES/NO], I can't.
+
+I need money to travel.
+Necesito dinero para viajar.
+Can I travel without money? [YES/NO], I can't.
+
+I want to buy souvenirs in Rome.
+Quiero comprar recuerdos en Roma.
+Do I want to buy souvenirs? [YES/NO], I do.
+
+I can use a credit card to buy things too.
+También puedo utilizar una tarjeta de crédito para comprar cosas.
+Can I use credit cards to buy things? [YES/NO], I can.
+
+I will stay at a hotel when I get to Rome.
+Me alojaré en un hotel cuando llegue a Roma.
+Will I stay at a resort when I get to Rome? [YES/NO], I will stay at a hotel.
+
+I use a suitcase and pack my clothes.
+Utilizo una maleta y preparo mi ropa.
+Will I pack my clothes in a box? [YES/NO], I will use a suitcase.
+
+I will take my Ipad and a book too.
+También llevaré mi iPad y un libro.
+Will I take my book to Rome? [YES/NO], I will.
+
+My plane departs from Mexico City at 11:00 am.
+Mi avión sale de Ciudad de México a las 11:00 am.
+Does my plane depart at 9:00 am? [YES/NO], it doesn't.
+
+My plane arrives in Rome at 10:00 pm.
+Mi avión llega a Roma a las 10:00 pm.
+Does my plane arrive at 10:00 pm? [YES/NO], it does.
+
+I have to arrive at the airport early.
+Tengo que llegar pronto al aeropuerto.
+Can I arrive at the airport late? [YES/NO], I can't.
+
+I take a taxi cab to the airport.
+Cojo un taxi hasta el aeropuerto.
+Do I ride my bike to the airport? [YES/NO], I don't.
+
+My luggage is checked by security.
+Seguridad revisa mi equipaje.
+Does the pilot check my luggage? [YES/NO], the pilot does not.
+
+My plane takes off on time.
+Mi avión despega a la hora prevista.
+Does my plane take off late? [YES/NO], it takes off on time.
+
+My flight to Rome is long.
+Mi vuelo a Roma es largo.
+Is the flight short? [YES/NO], it is a long flight.
+
+I watch a movie on the plane.
+Veo una película en el avión.
+Do I watch a movie on the flight? [YES/NO], I do.
+
+I am glad when the flight is over.
+Me alegro de que haya terminado.
+Am I glad when the flight is over? [YES/NO], I am.
+
+After I land, I check in at my hotel.
+Después de aterrizar, me registro en el hotel.
+After I land, do I go and get pizza? [YES/NO], I check-in at the hotel.
